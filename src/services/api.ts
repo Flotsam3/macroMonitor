@@ -2,249 +2,152 @@ import { Options } from "../context/OptionContext";
 
 const URL: string = import.meta.env.VITE_API_URL || "/api";
 
-export const createOptions = async (payload: object) => {
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get token from localStorage
+ */
+const getToken = (): string | null => {
+  return localStorage.getItem("token");
+};
+
+/**
+ * Get auth headers with token
+ */
+const getAuthHeaders = (): HeadersInit => {
+  const token = getToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+};
+
+/**
+ * Handle fetch with error handling
+ */
+const apiFetch = async (url: string, options?: RequestInit) => {
   try {
-    const response = await fetch(URL + "/options", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(url, options);
+
+    // Handle 401 - token expired/invalid
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login"; // Redirect to login
+      throw new Error("Unauthorized");
+    }
 
     if (!response.ok) {
-      console.error(`Error creating options: ${response.status} ${response.statusText}`);
+      console.error(`Error: ${response.status} ${response.statusText}`);
       return null;
     }
 
-    const data = await response.json();
-    return data;
+    // Handle 204 No Content
+    if (response.status === 204) {
+      return true;
+    }
+
+    return await response.json();
   } catch (error) {
-    console.error("Network or parsing error (createOptions):", error);
+    console.error("Network error:", error);
     return null;
   }
+};
+
+// ============================================
+// AUTH FUNCTIONS
+// ============================================
+
+export const register = async (email: string, password: string, name?: string) => {
+  const data = await apiFetch(URL + "/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, name }),
+  });
+
+  if (data?.token) {
+    localStorage.setItem("token", data.token);
+  }
+
+  return data;
+};
+
+export const login = async (email: string, password: string) => {
+  const data = await apiFetch(URL + "/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (data?.token) {
+    localStorage.setItem("token", data.token);
+  }
+
+  return data;
+};
+
+export const logout = () => {
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+};
+
+export const getProfile = async () => {
+  return apiFetch(URL + "/auth/profile", {
+    headers: getAuthHeaders(),
+  });
+};
+
+// ============================================
+// OPTIONS
+// ============================================
+
+export const createOptions = async (payload: object) => {
+  return apiFetch(URL + "/options", {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
 };
 
 export const updateOptions = async (payload: object) => {
-  try {
-    const response = await fetch(URL + "/options", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      console.error(`Error updating options: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (updateOptions):", error);
-    return null;
-  }
+  return apiFetch(URL + "/options", {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
 };
 
 export const getAllOptions = async () => {
-  try {
-    const response = await fetch(URL + "/options");
-
-    if (!response.ok) {
-      console.error(`Error fetching options: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (getAllOptions):", error);
-    return null;
-  }
+  return apiFetch(URL + "/options", {
+    headers: getAuthHeaders(),
+  });
 };
 
+// ============================================
+// FOOD
+// ============================================
+
 export const createFood = async (payload: object) => {
-  try {
-    const response = await fetch(URL + "/food", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      console.error(`Error creating food: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (createFood):", error);
-    return null;
-  }
+  return apiFetch(URL + "/food", {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
 };
 
 export const getAllFood = async () => {
-  try {
-    const response = await fetch(URL + "/food");
-
-    if (!response.ok) {
-      console.error(`Error fetching food: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (getAllFood):", error);
-    return null;
-  }
+  return apiFetch(URL + "/food", {
+    headers: getAuthHeaders(),
+  });
 };
 
 export const deleteFoodItem = async (payload: object) => {
-  try {
-    const response = await fetch(URL + "/food", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      console.error(`Error deleting food item: ${response.status} ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Network or parsing error (deleteFoodItem):", error);
-  }
-};
-
-export const saveConsumption = async (payload: Options[]) => {
-  try {
-    const response = await fetch(URL + "/consumption", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      console.error(`Error saving consumption: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (saveConsumption):", error);
-    return null;
-  }
-};
-
-export const getConsumption = async () => {
-  try {
-    const response = await fetch(URL + "/consumption");
-
-    if (!response.ok) {
-      console.error(`Error fetching consumption: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (getConsumption):", error);
-    return null;
-  }
-};
-
-export const deleteConsumptionItem = async (id: string): Promise<void> => {
-  try {
-    const response = await fetch(URL + `/consumption/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      console.error(`Error deleting consumption item: ${response.status} ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Network error (deleteConsumptionItem):", error);
-  }
-};
-
-export const deleteConsumption = async (): Promise<void> => {
-  try {
-    const response = await fetch(URL + "/consumption", {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      console.error(`Error deleting all consumption: ${response.status} ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Network error (deleteConsumption):", error);
-  }
-};
-
-export const createArchiveItem = async (payload: object) => {
-  try {
-    const response = await fetch(URL + "/archive", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      console.error(`Error creating archive item: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (createArchiveItem):", error);
-    return null;
-  }
-};
-
-export const getArchive = async () => {
-  try {
-    const response = await fetch(URL + "/archive");
-
-    if (!response.ok) {
-      console.error(`Error fetching archive: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Network or parsing error (getArchive):", error);
-    return null;
-  }
-};
-
-export const deleteArchiveItem = async (id: string): Promise<void> => {
-  try {
-    const response = await fetch(URL + `/archive/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      console.error(`Error deleting archive item: ${response.status} ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Network error (deleteArchiveItem):", error);
-  }
-};
-
-export const deleteArchive = async (): Promise<void> => {
-  try {
-    const response = await fetch(URL + "/archive", {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      console.error(`Error deleting archive: ${response.status} ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Network error (deleteArchive):", error);
-  }
+  return apiFetch(URL + "/food", {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
 };
 
 export const uploadImage = async (
@@ -252,21 +155,73 @@ export const uploadImage = async (
   image: string,
   base64Image: string | ArrayBuffer
 ): Promise<void> => {
-  try {
-    const response = await fetch(URL + "/food/images/" + id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ previousImage: image, image: base64Image }),
-    });
+  return apiFetch(URL + "/food/images/" + id, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ previousImage: image, image: base64Image }),
+  });
+};
 
-    if (!response.ok) {
-      console.error(`Error uploading image: ${response.status} ${response.statusText}`);
-    }
+// ============================================
+// CONSUMPTION
+// ============================================
 
-    await response.json();
-  } catch (error) {
-    console.error("Network or parsing error (uploadImage):", error);
-  }
+export const saveConsumption = async (payload: Options[]) => {
+  return apiFetch(URL + "/consumption", {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const getConsumption = async () => {
+  return apiFetch(URL + "/consumption", {
+    headers: getAuthHeaders(),
+  });
+};
+
+export const deleteConsumptionItem = async (id: string): Promise<void> => {
+  return apiFetch(URL + `/consumption/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+};
+
+export const deleteConsumption = async (): Promise<void> => {
+  return apiFetch(URL + "/consumption", {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+};
+
+// ============================================
+// ARCHIVE
+// ============================================
+
+export const createArchiveItem = async (payload: object) => {
+  return apiFetch(URL + "/archive", {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const getArchive = async () => {
+  return apiFetch(URL + "/archive", {
+    headers: getAuthHeaders(),
+  });
+};
+
+export const deleteArchiveItem = async (id: string): Promise<void> => {
+  return apiFetch(URL + `/archive/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+};
+
+export const deleteArchive = async (): Promise<void> => {
+  return apiFetch(URL + "/archive", {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
 };

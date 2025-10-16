@@ -1,6 +1,7 @@
 import {Schema, model} from "mongoose";
 
 type Options = {
+    userId:string
     calories:number
     carbohydrates:number
     fat:number
@@ -11,6 +12,7 @@ type Options = {
 };
 
 const optionsSchema = new Schema({
+    userId: {type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true},
     calories:{type:Number, default:2000},
     carbohydrates:{type:Number, default:0.55},
     fat:{type:Number, default:0.3},

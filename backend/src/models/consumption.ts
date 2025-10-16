@@ -1,6 +1,7 @@
 import {Schema, model} from "mongoose";
 
 type ConsumptionItem = {
+    userId:string
     name:string
     grams:number
     calories:number
@@ -13,6 +14,7 @@ type ConsumptionItem = {
 }
 
 const consumptionSchema = new Schema({
+    userId: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     name:{type:String, required:true},
     grams:{type:Number, required:true},
     calories:{type:Number, required:true},
