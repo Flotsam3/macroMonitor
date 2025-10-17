@@ -59,10 +59,10 @@ export default function LandingPage() {
          <HowItWorks />
          <section id="about" className={styles.about}>
             <div className={styles.aboutContainer}>
-               <h2>About NutriTrack</h2>
+               <h2>About MacroMonitor</h2>
                <p>
                   We believe that tracking your nutrition shouldn't be complicated. That's why we
-                  built NutriTrack - a simple, intuitive app that helps you understand what you're
+                  built MacroMonitor - a simple, intuitive app that helps you understand what you're
                   eating and make better choices for your health.
                </p>
             </div>

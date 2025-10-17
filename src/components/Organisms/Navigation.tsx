@@ -6,8 +6,6 @@ import { logout } from "../../services/api";
 export default function Navigation() {
    const handleLogout = () => {
       logout();
-      // logout() already redirects, but if you want to navigate:
-      // navigate("/");
    };
 
    return (

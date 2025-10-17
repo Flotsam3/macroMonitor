@@ -1,54 +1,58 @@
 @use "../../assets/variables" as var;
 
 .mobileWrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    overflow: hidden;
-    .burgerMenuWrapper {
-        display: none;
-        position: fixed;
-        top: 1rem;
-        right: 2rem;
-        width: 80px;
-        z-index: 50;
-        @media screen and (max-width:1049px) {
-           display: block;
-           width: 2em;
-        }
-        img {
-           width: 100%;
-           cursor: pointer;
-        }
-     }
-     .mobileMenu {
-        position: absolute;
-        top: 0;
-        right: -350px;
-        height: 100vh;
-        width: 12rem;
-        padding: 2rem 1rem 0 0;
-        background-color: var.$secondary-bg;
-        z-index: 100;
-        transition: 1s ease-in-out;
-        li {
-           margin-bottom: 1em;
-           list-style-type: none;
-           font-size: 1.3rem;
-           text-align: right;
-           img {
-              width: 1em;
-           }
-           a {
-              color: white;
-              text-decoration: none;
-           }
-        }
-     }
-     .slideMenu {
-        right: 0;
-        overflow: hidden;
-     }
+   display: none;
+   position: absolute;
+   top: 0;
+   right: 0;
+   left: 0;
+   bottom: 0;
+   overflow: hidden;
+   @media (max-width: 768px) {
+      display: block;
+   }
+   .burgerMenuWrapper {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      right: 2rem;
+      width: 80px;
+      z-index: 50;
+      @media screen and (max-width: 1049px) {
+         display: block;
+         width: 2em;
+      }
+      img {
+         width: 100%;
+         cursor: pointer;
+      }
+   }
+   .mobileMenu {
+      position: absolute;
+      top: 0;
+      right: -350px;
+      height: 100vh;
+      width: 12rem;
+      padding: 2rem 1rem 0 0;
+      background-color: var.$secondary-bg;
+      z-index: 100;
+      transition: 1s ease-in-out;
+      li {
+         margin-bottom: 1em;
+         list-style-type: none;
+         font-size: 1.3rem;
+         text-align: right;
+         img {
+            width: 1em;
+         }
+         a {
+            color: white;
+            text-decoration: none;
+         }
+      }
+   }
+   .slideMenu {
+      right: 0;
+      overflow: hidden;
+   }
 }

@@ -1,3 +1,5 @@
+@use "../../assets/variables.scss" as var;
+
 .footer {
   background: #111827;
   color: white;
@@ -50,7 +52,7 @@
       transition: color 0.2s;
 
       &:hover {
-        color: #10b981;
+        color: var.$button-primary-1;
       }
     }
   }

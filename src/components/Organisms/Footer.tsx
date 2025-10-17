@@ -2,6 +2,9 @@ import Logo from "../Atoms/Logo";
 import styles from "./Footer.module.scss";
 
 export default function Footer() {
+  function getYear(){
+    return new Date().getFullYear();
+  }
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -44,11 +47,8 @@ export default function Footer() {
         </div>
 
         <div className={styles.bottom}>
-          <p>&copy; 2024 NutriTrack. All rights reserved.</p>
+          <p>&copy; {getYear()} MacroMonitor. All rights reserved.</p>
           <div className={styles.social}>
-            <span>🐦</span>
-            <span>📘</span>
-            <span>📸</span>
           </div>
         </div>
       </div>

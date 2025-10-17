@@ -1,3 +1,5 @@
+@use "../../assets/variables.scss" as var;
+
 .input {
   width: 100%;
   padding: 0.875rem 1rem;
@@ -8,7 +10,7 @@
   outline: none;
 
   &:focus {
-    border-color: #10b981;
+    border-color: var.$button-primary-2;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
   }
 

@@ -1,3 +1,5 @@
+@use "../../assets/variables.scss" as var;
+
 .navbar {
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -27,7 +29,7 @@
     transition: color 0.3s ease;
 
     &:hover {
-      color: #10b981;
+      color: var.$button-primary-1;
     }
   }
 

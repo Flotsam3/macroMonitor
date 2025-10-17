@@ -1,26 +1,34 @@
 import SectionTitle from "../Atoms/SectionTitle";
 import FeatureCard from "../Molecules/FeatureCard";
 import styles from "./Features.module.scss";
+import imageUpload from "../../assets/images/landingPage/pumpkins.jpg";
+import macroTracking from "../../assets/images/landingPage/macros.jpg";
+import salt from "../../assets/images/landingPage/salt.jpg";
+import archive from "../../assets/images/landingPage/archiv.jpg";
 
 export default function Features() {
   const features = [
     {
-      icon: "📸",
+      image: imageUpload,
+      alt:"Pumpkins",
       title: "Image Upload",
       description: "Simply snap a photo of any product and let our app do the rest. Quick and effortless tracking.",
     },
     {
-      icon: "📊",
+      image: macroTracking,
+      alt:"Food labeled with proteins, carbs and fats",
       title: "Macro Tracking",
       description: "Monitor your proteins, carbs, and fats with precision. Stay on top of your nutritional goals.",
     },
     {
-      icon: "🧂",
+      image: salt,
+      alt:"",
       title: "Essential Nutrients",
       description: "Track salt, sugar, saturated fats, and other vital nutrients to maintain a balanced diet.",
     },
     {
-      icon: "📅",
+      image: archive,
+      alt:"",
       title: "Daily Archive",
       description: "Review your nutrition history anytime. See patterns and make informed decisions about your diet.",
     },
@@ -37,7 +45,8 @@ export default function Features() {
           {features.map((feature, index) => (
             <FeatureCard
               key={index}
-              icon={feature.icon}
+              image={feature.image}
+              alt={feature.alt}
               title={feature.title}
               description={feature.description}
             />

@@ -1,4 +1,5 @@
 import styles from "./Logo.module.scss";
+import logo from "../../assets/images/landingPage/logo-v3.png";
 
 type LogoProps = {
   size?: "small" | "medium" | "large";
@@ -7,8 +8,8 @@ type LogoProps = {
 export default function Logo({ size = "medium" }: LogoProps) {
   return (
     <div className={`${styles.logo} ${styles[size]}`}>
-      <span className={styles.icon}>🥗</span>
-      <span className={styles.text}>NutriTrack</span>
+      <img src={logo} alt="app logo" />
+      <span className={styles.text}>MacroMonitor</span>
     </div>
   );
 }
