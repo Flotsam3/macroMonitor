@@ -60,7 +60,7 @@ const apiFetch = async (url: string, options?: RequestInit) => {
 // ============================================
 
 export const register = async (email: string, password: string, name?: string) => {
-  const data = await apiFetch(URL + "/auth/register", {
+  const data = await apiFetch(URL + "/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, name }),
@@ -74,7 +74,7 @@ export const register = async (email: string, password: string, name?: string) =
 };
 
 export const login = async (email: string, password: string) => {
-  const data = await apiFetch(URL + "/auth/login", {
+  const data = await apiFetch(URL + "/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -93,7 +93,7 @@ export const logout = () => {
 };
 
 export const getProfile = async () => {
-  return apiFetch(URL + "/auth/profile", {
+  return apiFetch(URL + "/profile", {
     headers: getAuthHeaders(),
   });
 };

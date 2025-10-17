@@ -1,0 +1,33 @@
+@use "../../assets/variables.scss" as var;
+
+.stepCard {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.number {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var.$button-primary-2;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.description {
+  color: #6b7280;
+  line-height: 1.6;
+}

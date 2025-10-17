@@ -1,0 +1,31 @@
+@use "../../assets/variables.scss" as var;
+
+.howItWorks {
+   padding: 5rem 2rem;
+   background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+}
+
+.container {
+   max-width: 1200px;
+   margin: 0 auto;
+}
+
+.steps {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+   gap: 3rem;
+   position: relative;
+
+   @media (min-width: 968px) {
+      &::before {
+         content: "";
+         position: absolute;
+         top: 10px;
+         left: 15%;
+         right: 15%;
+         height: 2px;
+         background-color: var.$button-primary-2;
+         z-index: 0;
+      }
+   }
+}

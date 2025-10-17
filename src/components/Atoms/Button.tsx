@@ -7,10 +7,11 @@ type ButtonProps = {
     appearance: "typeA" | "typeB"
     onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined
     children?:JSX.Element
+    disabled?: boolean
 };
 
-export default function Button({label, type, appearance, onClick, children}: ButtonProps) {
+export default function Button({label, type, appearance, onClick, disabled, children}: ButtonProps) {
   return (
-    <button className={styles[appearance]} type={type} onClick={onClick}>{label}{children}</button>
+    <button className={styles[appearance]} type={type} disabled={disabled} onClick={onClick}>{label}{children}</button>
   )
 };

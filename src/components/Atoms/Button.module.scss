@@ -1,29 +1,83 @@
 @use "../../assets/variables.scss" as var;
 
 button {
-    font-size: clamp(0.8rem, 1.3vw, 2.3rem);
-    color: var.$font-light;
-    border: none;
-    border-radius: 99vh;
-    transition: 0.7s background-color;
-    cursor: pointer;
- }
- button.typeA{
-    padding: 1em 3em;
-    background-color: var.$button-primary-1;
- }
- button.typeA:hover{
-    background-color: transparent;
-    color: var.$button-primary-1;
-    outline: 3px solid var.$button-primary-1;
- }
- button.typeB{
-    position: relative;
-    padding: 1em 2.22em;
-    background-color: var.$button-primary-2;
- }
- button.typeB:hover {
-    background-color: transparent;
-    color: var.$button-primary-2;
-    outline: 3px solid var.$button-primary-2;
- }
+   font-size: clamp(0.8rem, 1.3vw, 2.3rem);
+   color: var.$font-light;
+   border: none;
+   border-radius: 99vh;
+   transition: 0.7s background-color;
+   cursor: pointer;
+   &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+.typeA {
+   background-color: var.$button-primary-1;
+   color: white;
+   padding: 0.875rem 2rem;
+   border: none;
+   border-radius: 12px;
+   font-size: 1rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.3s ease;
+   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+
+   &:hover {
+      background-color: transparent;
+      color: var.$button-primary-1;
+      outline: 3px solid var.$button-primary-1;
+   }
+
+   &:active {
+      transform: translateY(0);
+   }
+}
+
+.typeB {
+   position: relative;
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+   padding: 0.875rem 2rem;
+   background-color: var.$button-primary-2;
+   color: white;
+   border-radius: 12px;
+   font-size: 1rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.3s ease;
+
+   &:hover {
+      background-color: transparent;
+      color: var.$button-primary-2;
+      outline: 3px solid var.$button-primary-2;
+   }
+
+   &:active {
+      transform: translateY(0);
+   }
+}
+//  button.typeA{
+//     padding: 1em 3em;
+//     background-color: var.$button-primary-1;
+//  }
+//  button.typeA:hover{
+//     background-color: transparent;
+//     color: var.$button-primary-1;
+//     outline: 3px solid var.$button-primary-1;
+//  }
+//  button.typeB{
+//     position: relative;
+//     padding: 1em 2.22em;
+//     background-color: var.$button-primary-2;
+//  }
+//  button.typeB:hover {
+//     background-color: transparent;
+//     color: var.$button-primary-2;
+//     outline: 3px solid var.$button-primary-2;
+//  }
