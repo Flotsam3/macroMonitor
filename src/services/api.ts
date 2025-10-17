@@ -2,26 +2,23 @@ import { Options } from "../context/OptionContext";
 
 const URL: string = import.meta.env.VITE_API_URL || "/api";
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
 /**
- * Get token from localStorage
+ * Check if user is authenticated (doesn't redirect on failure)
  */
-const getToken = (): string | null => {
-  return localStorage.getItem("token");
-};
+export const checkAuth = async () => {
+  try {
+    const response = await fetch(URL + "/profile", {
+      credentials: "include",
+    });
 
-/**
- * Get auth headers with token
- */
-const getAuthHeaders = (): HeadersInit => {
-  const token = getToken();
-  return {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
+    if (response.ok) {
+      return await response.json();
+    }
+    return null;
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return null;
+  }
 };
 
 /**
@@ -29,11 +26,10 @@ const getAuthHeaders = (): HeadersInit => {
  */
 const apiFetch = async (url: string, options?: RequestInit) => {
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {...options, credentials: "include"});
 
     // Handle 401 - token expired/invalid
     if (response.status === 401) {
-      localStorage.removeItem("token");
       window.location.href = "/login"; // Redirect to login
       throw new Error("Unauthorized");
     }
@@ -60,42 +56,30 @@ const apiFetch = async (url: string, options?: RequestInit) => {
 // ============================================
 
 export const register = async (email: string, password: string, name?: string) => {
-  const data = await apiFetch(URL + "/register", {
+  return apiFetch(URL + "/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, name }),
   });
-
-  if (data?.token) {
-    localStorage.setItem("token", data.token);
-  }
-
-  return data;
 };
 
 export const login = async (email: string, password: string) => {
-  const data = await apiFetch(URL + "/login", {
+  return apiFetch(URL + "/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-
-  if (data?.token) {
-    localStorage.setItem("token", data.token);
-  }
-
-  return data;
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
-  window.location.href = "/login";
+export const logout = async () => {
+  await apiFetch(URL + "/logout", {
+    method: "POST",
+  });
+  window.location.href = "/";
 };
 
 export const getProfile = async () => {
-  return apiFetch(URL + "/profile", {
-    headers: getAuthHeaders(),
-  });
+  return apiFetch(URL + "/profile");
 };
 
 // ============================================
@@ -105,7 +89,7 @@ export const getProfile = async () => {
 export const createOptions = async (payload: object) => {
   return apiFetch(URL + "/options", {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 };
@@ -113,14 +97,14 @@ export const createOptions = async (payload: object) => {
 export const updateOptions = async (payload: object) => {
   return apiFetch(URL + "/options", {
     method: "PATCH",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 };
 
 export const getAllOptions = async () => {
   return apiFetch(URL + "/options", {
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
@@ -131,21 +115,21 @@ export const getAllOptions = async () => {
 export const createFood = async (payload: object) => {
   return apiFetch(URL + "/food", {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 };
 
 export const getAllFood = async () => {
   return apiFetch(URL + "/food", {
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
 export const deleteFoodItem = async (payload: object) => {
   return apiFetch(URL + "/food", {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 };
@@ -157,7 +141,7 @@ export const uploadImage = async (
 ): Promise<void> => {
   return apiFetch(URL + "/food/images/" + id, {
     method: "PUT",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ previousImage: image, image: base64Image }),
   });
 };
@@ -169,28 +153,28 @@ export const uploadImage = async (
 export const saveConsumption = async (payload: Options[]) => {
   return apiFetch(URL + "/consumption", {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 };
 
 export const getConsumption = async () => {
   return apiFetch(URL + "/consumption", {
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
 export const deleteConsumptionItem = async (id: string): Promise<void> => {
   return apiFetch(URL + `/consumption/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
 export const deleteConsumption = async (): Promise<void> => {
   return apiFetch(URL + "/consumption", {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
@@ -201,27 +185,27 @@ export const deleteConsumption = async (): Promise<void> => {
 export const createArchiveItem = async (payload: object) => {
   return apiFetch(URL + "/archive", {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 };
 
 export const getArchive = async () => {
   return apiFetch(URL + "/archive", {
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
 export const deleteArchiveItem = async (id: string): Promise<void> => {
   return apiFetch(URL + `/archive/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };
 
 export const deleteArchive = async (): Promise<void> => {
   return apiFetch(URL + "/archive", {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
 };

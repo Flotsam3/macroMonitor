@@ -4,88 +4,111 @@ import { generateToken } from "../middleware/auth";
 import bcrypt from "bcrypt";
 
 export const register = async (req: Request, res: Response) => {
-    try {
-        const { email, password, name } = req.body;
+   try {
+      const { email, password, name } = req.body;
 
-        // Validate input
-        if (!email || !password) {
-            return res.status(400).json({ msg: "Email and password are required!" });
-        }
+      // Validate input
+      if (!email || !password) {
+         return res.status(400).json({ msg: "Email and password are required!" });
+      }
 
-        if (password.length < 6) {
-            return res.status(400).json({ msg: "Password must be at least 6 characters!" });
-        }
+      if (password.length < 6) {
+         return res.status(400).json({ msg: "Password must be at least 6 characters!" });
+      }
 
-        // Create new user
-        const user = new User({ email, password, name });
-        await user.save();
+      // Create new user
+      const user = new User({ email, password, name });
+      await user.save();
 
-        // Generate token
-        const token = generateToken({ userId: user._id.toString() });
+      // Generate token
+      const token = generateToken({ userId: user._id.toString() });
 
-        res.status(201).json({
+      res.status(201)
+         .cookie("jwt", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // HTTPS only in production
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+         })
+         .json({
             msg: "User registered successfully!",
-            token,
             user: {
-                id: user._id
-            }
-        });
-    } catch (error) {
-        console.error("Register error:", error);
-        res.status(500).json({ msg: "Registration failed!" });
-    }
+               id: user._id,
+               email: user.email,
+               name: user.name,
+            },
+         });
+   } catch (error) {
+      console.error("Register error:", error);
+      res.status(500).json({ msg: "Registration failed!" });
+   }
 };
 
 export const login = async (req: Request, res: Response) => {
-    try {
-        const { email, password } = req.body;
+   try {
+      const { email, password } = req.body;
 
-        // Validate input
-        if (!email || !password) {
-            return res.status(400).json({ msg: "Email and password are required!" });
-        }
+      // Validate input
+      if (!email || !password) {
+         return res.status(400).json({ msg: "Email and password are required!" });
+      }
 
-        // Find user
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ msg: "Invalid credentials!" });
-        }
+      // Find user
+      const user = await User.findOne({ email });
+      if (!user) {
+         return res.status(401).json({ msg: "Invalid credentials!" });
+      }
 
-        // Compare password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ msg: "Invalid credentials!" });
-        }
+      // Compare password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+         return res.status(401).json({ msg: "Invalid credentials!" });
+      }
 
-        // Generate token
-        const token = generateToken({ userId: user._id.toString() });
+      // Generate token
+      const token = generateToken({ userId: user._id.toString() });
 
-        res.status(200).json({
+      res.status(200)
+         .cookie("jwt", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // HTTPS only in production
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+         })
+         .json({
             msg: "Login successful!",
-            token,
             user: {
-                id: user._id,
-                email: user.email,
-                name: user.name
-            }
-        });
-    } catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({ msg: "Login failed!" });
-    }
+               id: user._id,
+               email: user.email,
+               name: user.name,
+            },
+         });
+   } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ msg: "Login failed!" });
+   }
 };
 
 export const getProfile = async (req: Request, res: Response) => {
-    try {
-        const userId = (req as any).userId;
-        const user = await User.findById(userId).select('-password');
-        
-        if (!user) {
-            return res.status(404).json({ msg: "User not found!" });
-        }
+   try {
+      const userId = (req as any).userId;
+      const user = await User.findById(userId).select("-password");
 
-        res.status(200).json({ user });
-    } catch (error) {
-        res.status(500).json({ msg: "Failed to fetch profile!" });
-    }
+      if (!user) {
+         return res.status(404).json({ msg: "User not found!" });
+      }
+
+      res.status(200).json({ user });
+   } catch (error) {
+      res.status(500).json({ msg: "Failed to fetch profile!" });
+   }
+};
+
+export const logout = async (req: Request, res: Response) => {
+   try {
+      res.clearCookie("jwt");
+      res.status(200).json({ msg: "Logout successful!" });
+   } catch (error) {
+      res.status(500).json({ msg: "Logout failed!" });
+   }
 };

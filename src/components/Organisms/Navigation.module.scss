@@ -5,7 +5,7 @@ nav {
    font-size: 2rem;
    overflow-x: hidden;
    // padding: 2rem 2rem 0 0;
-   @media screen and (max-width:1049px) {
+   @media screen and (max-width: 1049px) {
       display: flex;
       justify-content: flex-end;
       padding: 0;
@@ -15,7 +15,7 @@ nav {
       justify-content: space-between;
       width: 50%;
       padding: 1em 0 0 1em;
-      @media screen and (max-width:1049px) {
+      @media screen and (max-width: 1049px) {
          display: none;
       }
       li {
@@ -41,18 +41,18 @@ nav {
             background-color: var.$button-primary-1;
             transform: scaleX(0);
             transition: transform 0.3s ease;
-          }
-          
-          a:hover::before {
+         }
+
+         a:hover::before {
             transform: scaleX(1);
-          }
-          .cog {
+         }
+         .cog {
             cursor: pointer;
             transition: 1s ease;
-          }
-          .cog:hover {
+         }
+         .cog:hover {
             transform: scale(0.7);
-          }
+         }
       }
    }
 }

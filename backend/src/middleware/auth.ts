@@ -32,8 +32,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
     const authReq = req as AuthRequest;
 
     try {
-        const authHeader = authReq.headers['authorization'];
-        const token = authHeader && authHeader.split(' ').at(-1);
+        const token = req.cookies.jwt;
 
         if (!token) {
             return res.status(401).json({ msg: "Authentication failed!" });

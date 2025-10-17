@@ -42,7 +42,7 @@ export default function AuthModal({
         response = await register(formData.email, formData.password, formData.name);
       }
 
-      if (response && response.token) {
+      if (response && response.user) {
         // Success! Token is already stored in localStorage by api.ts
         console.log("Authentication successful:", response);
         
@@ -50,10 +50,8 @@ export default function AuthModal({
         onClose();
         
         // Redirect to dashboard/main app
-        navigate("/"); // Change to your main app route
+        navigate("/");
         
-        // Optional: Reload to refresh auth state
-        // window.location.href = "/dashboard";
       } else {
         setError(response?.msg || "Authentication failed. Please try again.");
       }
