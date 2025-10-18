@@ -198,7 +198,7 @@ export default function Products() {
             </div>
             <NewFoodPanel handleCreateMenu={handleCreateMenu} />
             <img className={styles.banana} src={banana} alt="A half peeled banana" />
-            <div className={styles.addButtonWrapper}>
+            <div title="Save products with gram values into balance" className={styles.addButtonWrapper}>
                {food && food?.length > 0 && <button onClick={handleSaveSelection}>+</button>}
             </div>
          </div>
