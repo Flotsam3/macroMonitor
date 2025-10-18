@@ -1,5 +1,6 @@
 import Button from "../Atoms/Button";
 import styles from "./Hero.module.scss";
+import heroImg from "../../assets/images/landingPage/hero.png";
 
 type HeroProps = {
   onGetStarted: () => void;
@@ -34,7 +35,8 @@ export default function Hero({ onGetStarted }: HeroProps) {
             <div className={styles.phone}>
               <div className={styles.screen}>
                 <div className={styles.screenContent}>
-                  <div className={styles.stat}>
+                  <img src={heroImg} alt="Hero image of the app in mobile view" />
+                  {/* <div className={styles.stat}>
                     <span className={styles.label}>Calories</span>
                     <span className={styles.value}>1,847</span>
                   </div>
@@ -45,7 +47,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
                   <div className={styles.stat}>
                     <span className={styles.label}>Carbs</span>
                     <span className={styles.value}>215g</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
