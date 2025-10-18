@@ -30,7 +30,7 @@ const apiFetch = async (url: string, options?: RequestInit) => {
 
     // Handle 401 - token expired/invalid
     if (response.status === 401) {
-      window.location.href = "/login"; // Redirect to login
+      window.location.href = "/"; // Redirect to landing page
       throw new Error("Unauthorized");
     }
 

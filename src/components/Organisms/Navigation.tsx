@@ -15,7 +15,7 @@ export default function Navigation() {
                <Link to="/balance">Balance</Link>
             </li>
             <li>
-               <Link to="/">Products</Link>
+               <Link to="/products">Products</Link>
             </li>
             <li>
                <Link to="/archive">Archive</Link>

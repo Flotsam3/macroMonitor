@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import Button from "../Atoms/Button";
 import FormField from "../Molecules/FormField";
-import { login, register } from "../../services/api";
 import styles from "./AuthModal.module.scss";
 
 type AuthModalProps = {
@@ -17,6 +17,7 @@ export default function AuthModal({
   initialMode = "login",
 }: AuthModalProps) {
   const navigate = useNavigate();
+  const { login, register } = useAuth();
   const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [formData, setFormData] = useState({
     name: "",
@@ -34,30 +35,20 @@ export default function AuthModal({
     setLoading(true);
 
     try {
-      let response;
-
       if (mode === "login") {
-        response = await login(formData.email, formData.password);
+        await login(formData.email, formData.password);
       } else {
-        response = await register(formData.email, formData.password, formData.name);
+        await register(formData.email, formData.password, formData.name);
       }
 
-      if (response && response.user) {
-        // Success! Token is already stored in localStorage by api.ts
-        console.log("Authentication successful:", response);
-        
-        // Close modal
-        onClose();
-        
-        // Redirect to dashboard/main app
-        navigate("/");
-        
-      } else {
-        setError(response?.msg || "Authentication failed. Please try again.");
-      }
+      console.log("Authentication successful");
+      
+      onClose();
+      navigate("/products");
+      
     } catch (err) {
       console.error("Auth error:", err);
-      setError("Something went wrong. Please try again.");
+      setError("Authentication failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -68,7 +59,6 @@ export default function AuthModal({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    // Clear error when user starts typing
     if (error) setError(null);
   };
 
