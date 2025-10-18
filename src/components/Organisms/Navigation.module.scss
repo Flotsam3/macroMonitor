@@ -4,12 +4,6 @@ nav {
    width: 100%;
    font-size: 2rem;
    overflow-x: hidden;
-   // padding: 2rem 2rem 0 0;
-   @media screen and (max-width: 1049px) {
-      display: flex;
-      justify-content: flex-end;
-      padding: 0;
-   }
    .desktopMenu {
       display: flex;
       justify-content: space-between;

@@ -40,7 +40,7 @@
       li {
          margin-bottom: 1em;
          list-style-type: none;
-         font-size: 1.3rem;
+         font-size: clamp(1rem, 2vw, 1.3rem);
          text-align: right;
          img {
             width: 1em;

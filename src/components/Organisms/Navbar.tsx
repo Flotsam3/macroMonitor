@@ -54,25 +54,15 @@ export default function Navbar({ onAuthClick }: NavbarProps) {
             <li onClick={() => scrollToSection("features")}>Features</li>
             <li onClick={() => scrollToSection("how-it-works")}>How It Works</li>
             <li onClick={() => scrollToSection("about")}>About</li>
-          </ul>
-          <div className={styles.mobileAuthButtons}>
-            <Button
-              label="Login"
-              appearance="typeB"
-              onClick={() => {
+            <li onClick={() => {
                 onAuthClick("login");
                 setMobileMenuOpen(false);
-              }}
-            />
-            <Button
-              label="Sign Up"
-              appearance="typeA"
-              onClick={() => {
+              }}>Login</li>
+            <li onClick={() => {
                 onAuthClick("register");
                 setMobileMenuOpen(false);
-              }}
-            />
-          </div>
+              }}>Sign Up</li>
+          </ul>
         </div>
       )}
     </nav>
