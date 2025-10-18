@@ -41,10 +41,21 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
    };
 
    function sanitizeInput(inputValue: InputValue): InputValue | null {
+      const fields: (keyof InputValue)[] = [
+         "name",
+         "calories",
+         "carbohydrates",
+         "fat",
+         "protein",
+         "saturatedFat",
+         "sugar",
+         "salt",
+      ];
+
       const sanitized: Partial<InputValue> = {};
 
-      for (const key in inputValue) {
-         const value = inputValue[key as keyof InputValue];
+      for (const key of fields) {
+         const value = inputValue[key];
 
          if (key === "name") {
             sanitized.name = typeof value === "string" ? value.trim() : "";
@@ -53,7 +64,7 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
                const replaced = value.replace(",", ".");
                const testFloat = parseFloat(replaced);
                if (isNaN(testFloat)) return null;
-               sanitized[key as keyof InputValue] = replaced;
+               sanitized[key] = replaced;
             } else {
                return null;
             }
