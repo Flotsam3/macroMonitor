@@ -80,7 +80,7 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
          const sanitized = sanitizeInput(inputValue as InputValue);
          if (!sanitized) return handleValidationError("Invalid data format!");
 
-         const response = await createFood(inputValue);
+         const response = await createFood(sanitized);
          if (response.errors) return handleValidationError(response.errors[0].msg);
          setInputValue({
             name: "",
