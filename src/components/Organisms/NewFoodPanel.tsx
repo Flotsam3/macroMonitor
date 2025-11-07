@@ -3,12 +3,13 @@ import styles from "./NewFoodPanel.module.scss";
 import MacronutrientInput from "../Molecules/MacronutrientInput";
 import Button from "../Atoms/Button";
 import { Nutrient } from "../Molecules/OptionItem";
-import { createFood, getAllFood } from "../../services/api";
+import { createFood, getAllFood, uploadImage } from "../../services/api";
 import { OptionContext } from "../../context/OptionContext";
 import { ToastContainer, toast, Zoom } from "react-toastify";
 import { useState } from "react";
 import BarcodeScanner from "../Molecules/BarcodeScanner";
 import { lookupBarcode } from "../../services/productLookup";
+import { downloadImageAsBase64 } from "../../services/imageHelper";
 import "react-toastify/dist/ReactToastify.css";
 
 type HandleCreateMenuType = () => void;
@@ -45,7 +46,8 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
    };
 
    function sanitizeInput(inputValue: InputValue): InputValue | null {
-      const fields: (keyof InputValue)[] = [
+      const fields: (keyof Omit<InputValue, "imageUrl">)[] = [
+         // Exclude imageUrl from validation
          "name",
          "calories",
          "carbohydrates",
@@ -115,8 +117,35 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
          const sanitized = sanitizeInput(inputValue as InputValue);
          if (!sanitized) return handleValidationError("Invalid data format!");
 
+         // Save the food item first
          const response = await createFood(sanitized);
          if (response.errors) return handleValidationError(response.errors[0].msg);
+
+         // If there's an image URL from barcode scan, upload it
+         if (inputValue.imageUrl && response.data?._id) {
+            console.log("Uploading product image from:", inputValue.imageUrl);
+
+            toast.info("Uploading product image...", {
+               position: "top-center",
+               autoClose: 2000,
+               hideProgressBar: true,
+               theme: "colored",
+            });
+
+            const base64Image = await downloadImageAsBase64(inputValue.imageUrl);
+
+            if (base64Image) {
+               await uploadImage(response.data._id, "", base64Image);
+               toast.success("Image uploaded!", {
+                  position: "top-center",
+                  autoClose: 1500,
+                  hideProgressBar: true,
+                  theme: "colored",
+               });
+            }
+         }
+
+         // Reset form
          setInputValue({
             name: "",
             calories: "",
@@ -126,12 +155,16 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
             saturatedFat: "",
             sugar: "",
             salt: "",
+            imageUrl: "",
          });
+
+         // Refresh food list
          const data = await getAllFood();
          if (setFoodData) {
             setFoodData(data);
          }
-         console.log({ response });
+
+         console.log("Food item created:", response);
       }
    }
 

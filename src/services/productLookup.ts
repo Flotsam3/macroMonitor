@@ -29,6 +29,7 @@ export async function lookupBarcode(barcode: string) {
         saturatedFat: getNutrient("saturated-fat_100g"),
         sugar: getNutrient("sugars_100g"),
         salt: getNutrient("salt_100g"),
+        imageUrl: product.image_url || product.image_front_url || "",
       };
 
       return productData;

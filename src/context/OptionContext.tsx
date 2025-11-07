@@ -24,6 +24,7 @@ export type InputValues = {
     saturatedFat:string
     sugar:string
     salt:string
+    imageUrl?: string
 }
 
 type OptionsContext = {
