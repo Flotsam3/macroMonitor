@@ -1,82 +1,97 @@
 @use "../../assets/variables" as var;
 
 .panelWrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 2em;
-    width: 70%;
-    border-radius: 15px;
-    @media screen and (max-width:1450px) {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   margin-top: 2em;
+   width: 70%;
+   border-radius: 15px;
+   @media screen and (max-width: 1450px) {
       width: 100%;
       margin-top: 0.5rem;
    }
-    h1 {
-       font-family: 'Medula One', cursive;
-       font-size: clamp(2.5rem, 3vw, 5rem);
-       font-weight: 400;
-       width: 60%;
-       @media screen and (max-width:1450px) {
+   .scannerWrapper {
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+   }
+   h1 {
+      font-family: "Medula One", cursive;
+      font-size: clamp(2.5rem, 3vw, 5rem);
+      font-weight: 400;
+      width: 60%;
+      @media screen and (max-width: 1450px) {
          text-align: center;
       }
-    }
-    .panel {
-       display: flex;
-       padding: 0.5em 1.5em;
-       color: var.$font-light;
-       border-radius: 15px;
-       width: 70%;
-       @media screen and (max-width:1450px) {
+   }
+   .panel {
+      display: flex;
+      padding: 0.5em 1.5em;
+      color: var.$font-light;
+      border-radius: 15px;
+      width: 70%;
+      @media screen and (max-width: 1450px) {
          width: initial;
       }
-      @media screen and (max-width:870px) {
+      @media screen and (max-width: 870px) {
          flex-direction: column;
          gap: 10px;
          padding: 0.5em;
       }
-       input:focus {
-          outline: 3px solid var.$primary-bg;
-       }
-       .nameWrapper {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          gap: 10px;
-          width: 12em;
-          h4 {
+      input:focus {
+         outline: 3px solid var.$primary-bg;
+      }
+      .nameWrapper {
+         position: relative;
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         gap: 10px;
+         width: 12em;
+         .nameInputGroup {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+
+            input {
+               flex: 1; // Makes input take remaining space
+            }
+         }
+         h4 {
             padding-left: 10px;
-          }
-          input {
-             width: 70%;
-             padding: 0.5em 1em;
-             background-color: #474654;
-             color: white;
-             text-align: center;
-             border-radius: 99vh;
-             border: none;
-          }
-       }
-       .macrosWrapper {
-          display: flex;
-          @media screen and (max-width:500px) {
+         }
+         input {
+            width: 70%;
+            padding: 0.5em 1em;
+            background-color: #474654;
+            color: white;
+            text-align: center;
+            border-radius: 99vh;
+            border: none;
+         }
+      }
+      .macrosWrapper {
+         display: flex;
+         @media screen and (max-width: 500px) {
             flex-direction: column;
             gap: 10px;
          }
-          .innerMacrosWrapper {
+         .innerMacrosWrapper {
             display: flex;
-          }
-       }
-    }
-    .buttonWrapper {
-       display: flex;
-       justify-content: center;
-       gap: 1.5em;
-       margin-top: 4em;
-       @media screen and (max-width:1500px) {
+         }
+      }
+   }
+   .buttonWrapper {
+      display: flex;
+      justify-content: center;
+      gap: 1.5em;
+      margin-top: 4em;
+      @media screen and (max-width: 1500px) {
          margin-top: 2rem;
       }
-      @media screen and (max-width:870px) {
+      @media screen and (max-width: 870px) {
          margin-top: 0.5rem;
       }
-    }
- }
+   }
+}

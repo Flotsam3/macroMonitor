@@ -6,6 +6,9 @@ import { Nutrient } from "../Molecules/OptionItem";
 import { createFood, getAllFood } from "../../services/api";
 import { OptionContext } from "../../context/OptionContext";
 import { ToastContainer, toast, Zoom } from "react-toastify";
+import { useState } from "react";
+import BarcodeScanner from "../Molecules/BarcodeScanner";
+import { lookupBarcode } from "../../services/productLookup";
 import "react-toastify/dist/ReactToastify.css";
 
 type HandleCreateMenuType = () => void;
@@ -16,6 +19,7 @@ type NewFoodPanelProps = {
 
 export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): JSX.Element {
    const { setFoodData, inputValue, setInputValue } = useContext(OptionContext);
+   const [isScanning, setIsScanning] = useState(false);
 
    function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
       const name = evt.target.name;
@@ -124,6 +128,34 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
       });
    }
 
+   async function handleBarcodeScanned(barcode: string) {
+      toast.info("Looking up product...", {
+         position: "top-center",
+         autoClose: 1500,
+         hideProgressBar: true,
+         theme: "colored",
+      });
+
+      const productData = await lookupBarcode(barcode);
+
+      if (productData && setInputValue) {
+         setInputValue(productData);
+         toast.success(`Found: ${productData.name}`, {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: true,
+            theme: "colored",
+         });
+      } else {
+         toast.error("Product not found in database", {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: true,
+            theme: "colored",
+         });
+      }
+   }
+
    return (
       <div className={styles.panelWrapper}>
          <ToastContainer
@@ -140,10 +172,17 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
             theme="colored"
          />
          <h1>New Food Item</h1>
+         <div className={styles.scannerWrapper}>
+         </div>
          <div className={styles.panel}>
             <div className={styles.nameWrapper}>
                <h4>{"Name"}</h4>
                <input type="text" name="name" value={inputValue?.name} onChange={handleChange} />
+               <BarcodeScanner
+                  onScan={handleBarcodeScanned}
+                  isScanning={isScanning}
+                  setIsScanning={setIsScanning}
+               />
             </div>
             <div className={styles.macrosWrapper}>
                <MacronutrientInput

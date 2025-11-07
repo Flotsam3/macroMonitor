@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./MobileMenu.module.scss";
 import { logout } from "../../services/api";
-import cog from "../../assets/images/cogwheel.png";
 
 export default function MobileMenu() {
    const [isOpen, setIsOpen] = useState(false);

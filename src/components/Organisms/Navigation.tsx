@@ -20,13 +20,13 @@ export default function Navigation() {
             <li>
                <Link to="/archive">Archive</Link>
             </li>
-            <li onClick={handleLogout}>
-               <Link to="#">Logout</Link>
-            </li>
             <li>
                <Link className={styles.cogwheel} to="/options">
                   <img className={styles.cog} src={cog} alt="cog wheel icon" />
                </Link>
+            </li>
+            <li onClick={handleLogout}>
+               <Link to="#">Logout</Link>
             </li>
          </ul>
       </nav>
