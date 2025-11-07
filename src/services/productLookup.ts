@@ -1,7 +1,5 @@
 export async function lookupBarcode(barcode: string) {
   try {
-    console.log("🔍 Fetching barcode:", barcode);
-    
     const response = await fetch(
       `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
     );

@@ -42,7 +42,7 @@ export default function BarcodeScanner({ onScan, isScanning, setIsScanning }: Ba
         scanner.clear();
         setIsScanning(false);
       },
-      (errorMessage) => {
+      () => {
         // Silent - errors are normal during scanning
       }
     );
