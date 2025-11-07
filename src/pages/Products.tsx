@@ -53,8 +53,6 @@ export default function Products() {
 
       fetchOptions();
       getFood();
-      // return ()=>{
-      // };
    }, []);
 
    useEffect(() => {
@@ -209,7 +207,6 @@ export default function Products() {
                      <div className={styles.titleWrapper}>
                         <div className={styles.imageWrapper}>
                            <p className={styles.image}>
-                            {(console.log(loading, food._id, loading == food._id), null)}
                               {loading === food._id ? (
                                  <ClipLoader
                                     loading={loading == food._id}

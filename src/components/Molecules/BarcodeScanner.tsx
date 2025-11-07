@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { ScanBarcode, X } from "lucide-react"; // You can also try: Barcode, Scan, QrCode
 import styles from "./BarcodeScanner.module.scss";
 
@@ -11,34 +11,47 @@ interface BarcodeScannerProps {
 
 export default function BarcodeScanner({ onScan, isScanning, setIsScanning }: BarcodeScannerProps) {
    useEffect(() => {
-      if (isScanning) {
-         const scanner = new Html5QrcodeScanner(
-            "barcode-reader",
-            {
-               fps: 10,
-               qrbox: { width: 250, height: 250 },
-               aspectRatio: 1.0,
-            },
-            false
-         );
+  if (isScanning) {
+    const scanner = new Html5QrcodeScanner(
+      "barcode-reader",
+      {
+        fps: 10,
+        qrbox: { width: 300, height: 150 },
+        aspectRatio: 2.0,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.QR_CODE,
+        ],
+        rememberLastUsedCamera: true,
+        showTorchButtonIfSupported: true,
+        disableFlip: false,
+      },
+      false // Disable verbose logging
+    );
 
-         scanner.render(
-            (decodedText) => {
-               console.log("Barcode scanned:", decodedText);
-               onScan(decodedText);
-               scanner.clear();
-               setIsScanning(false);
-            },
-            (error) => {
-               // Ignore errors (they fire constantly during scanning)
-            }
-         );
-
-         return () => {
-            scanner.clear().catch(console.error);
-         };
+    scanner.render(
+      (decodedText, decodedResult) => {
+        console.log("Scanned:", decodedText, decodedResult.result.format?.formatName);
+        
+        onScan(decodedText);
+        scanner.clear();
+        setIsScanning(false);
+      },
+      (errorMessage) => {
+        // Silent - errors are normal during scanning
       }
-   }, [isScanning, onScan, setIsScanning]);
+    );
+
+    return () => {
+      scanner.clear().catch(console.error);
+    };
+  }
+}, [isScanning, onScan, setIsScanning]);
 
    return (
       <>

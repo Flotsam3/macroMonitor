@@ -62,15 +62,35 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
          const value = inputValue[key];
 
          if (key === "name") {
-            sanitized.name = typeof value === "string" ? value.trim() : "";
+            const trimmedName = typeof value === "string" ? value.trim() : "";
+            if (!trimmedName) {
+               console.error("Validation failed: Name is empty");
+               return null;
+            }
+            sanitized.name = trimmedName;
          } else {
-            if (typeof value === "string" && value.trim() !== "") {
-               const replaced = value.replace(",", ".");
+            // Handle numeric fields - allow "0" as valid
+            if (typeof value === "string") {
+               const trimmed = value.trim();
+
+               // If empty, default to "0"
+               if (trimmed === "") {
+                  sanitized[key] = "0";
+                  continue;
+               }
+
+               const replaced = trimmed.replace(",", ".");
                const testFloat = parseFloat(replaced);
-               if (isNaN(testFloat)) return null;
+
+               if (isNaN(testFloat)) {
+                  console.error(`Validation failed: ${key} is not a number (${trimmed})`);
+                  return null;
+               }
+
                sanitized[key] = replaced;
             } else {
-               return null;
+               // If undefined/null, default to "0"
+               sanitized[key] = "0";
             }
          }
       }
@@ -140,16 +160,17 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
 
       if (productData && setInputValue) {
          setInputValue(productData);
+
          toast.success(`Found: ${productData.name}`, {
             position: "top-center",
-            autoClose: 2000,
+            autoClose: 3000,
             hideProgressBar: true,
             theme: "colored",
          });
       } else {
-         toast.error("Product not found in database", {
+         toast.error("Product not found in Open Food Facts database", {
             position: "top-center",
-            autoClose: 2000,
+            autoClose: 3000,
             hideProgressBar: true,
             theme: "colored",
          });
@@ -172,8 +193,7 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
             theme="colored"
          />
          <h1>New Food Item</h1>
-         <div className={styles.scannerWrapper}>
-         </div>
+         <div className={styles.scannerWrapper}></div>
          <div className={styles.panel}>
             <div className={styles.nameWrapper}>
                <h4>{"Name"}</h4>
