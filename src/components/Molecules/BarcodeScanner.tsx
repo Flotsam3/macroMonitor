@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats, Html5QrcodeScanType } from "html5-qrcode";
 import { ScanBarcode, X } from "lucide-react"; // You can also try: Barcode, Scan, QrCode
 import styles from "./BarcodeScanner.module.scss";
 
@@ -9,49 +9,98 @@ interface BarcodeScannerProps {
    setIsScanning: (value: boolean) => void;
 }
 
+const scannerStyles = `
+  #barcode-reader__dashboard {
+    background-color: #2d3748 !important;
+    border-radius: 12px !important;
+  }
+  
+  #barcode-reader__dashboard_section {
+    color: #ffffff !important;
+    font-size: 1rem !important;
+  }
+  
+  #barcode-reader__dashboard_section_csr button {
+    background: #639E61 !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.875rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    margin-top: 0.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  #barcode-reader__dashboard_section_csr span {
+    color: #ffffff !important;
+    font-size: 1rem !important;
+  }
+  
+  #barcode-reader__camera_selection {
+    background-color: #374151 !important;
+    color: white !important;
+    border: 1px solid #4b5563 !important;
+    padding: 0.625rem !important;
+    border-radius: 6px !important;
+  }
+`;
+
 export default function BarcodeScanner({ onScan, isScanning, setIsScanning }: BarcodeScannerProps) {
    useEffect(() => {
-  if (isScanning) {
-    const scanner = new Html5QrcodeScanner(
-      "barcode-reader",
-      {
-        fps: 10,
-        qrbox: { width: 300, height: 150 },
-        aspectRatio: 2.0,
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.QR_CODE,
-        ],
-        rememberLastUsedCamera: true,
-        showTorchButtonIfSupported: true,
-        disableFlip: false,
-      },
-      false // Disable verbose logging
-    );
+      const styleEl = document.createElement("style");
+      styleEl.innerHTML = scannerStyles;
+      document.head.appendChild(styleEl);
 
-    scanner.render(
-      (decodedText, decodedResult) => {
-        console.log("Scanned:", decodedText, decodedResult.result.format?.formatName);
-        
-        onScan(decodedText);
-        scanner.clear();
-        setIsScanning(false);
-      },
-      () => {
-        // Silent - errors are normal during scanning
+      return () => {
+         document.head.removeChild(styleEl);
+      };
+   }, []);
+
+   useEffect(() => {
+      if (isScanning) {
+         const scanner = new Html5QrcodeScanner(
+            "barcode-reader",
+            {
+               fps: 10,
+               qrbox: { width: 300, height: 150 },
+               aspectRatio: 2.0,
+               formatsToSupport: [
+                  Html5QrcodeSupportedFormats.EAN_13,
+                  Html5QrcodeSupportedFormats.EAN_8,
+                  Html5QrcodeSupportedFormats.UPC_A,
+                  Html5QrcodeSupportedFormats.UPC_E,
+                  Html5QrcodeSupportedFormats.CODE_128,
+                  Html5QrcodeSupportedFormats.CODE_39,
+                  Html5QrcodeSupportedFormats.QR_CODE,
+               ],
+               rememberLastUsedCamera: true,
+               showTorchButtonIfSupported: true,
+               disableFlip: false,
+               supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] // Only camera, no file upload
+            },
+            false // Disable verbose logging
+         );
+
+         scanner.render(
+            (decodedText, decodedResult) => {
+               console.log("Scanned:", decodedText, decodedResult.result.format?.formatName);
+
+               onScan(decodedText);
+               scanner.clear();
+               setIsScanning(false);
+            },
+            () => {
+               // Silent - errors are normal during scanning
+            }
+         );
+
+         return () => {
+            scanner.clear().catch(console.error);
+         };
       }
-    );
-
-    return () => {
-      scanner.clear().catch(console.error);
-    };
-  }
-}, [isScanning, onScan, setIsScanning]);
+   }, [isScanning, onScan, setIsScanning]);
 
    return (
       <>

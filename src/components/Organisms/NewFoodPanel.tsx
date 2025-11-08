@@ -5,12 +5,13 @@ import Button from "../Atoms/Button";
 import { Nutrient } from "../Molecules/OptionItem";
 import { createFood, getAllFood, uploadImage } from "../../services/api";
 import { OptionContext } from "../../context/OptionContext";
-import { ToastContainer, toast, Zoom } from "react-toastify";
+import { ToastContainer, Zoom } from "react-toastify";
 import { useState } from "react";
 import BarcodeScanner from "../Molecules/BarcodeScanner";
 import { lookupBarcode } from "../../services/productLookup";
 import { downloadImageAsBase64 } from "../../services/imageHelper";
 import "react-toastify/dist/ReactToastify.css";
+import { showToast } from "../Atoms/CustomToast";
 
 type HandleCreateMenuType = () => void;
 
@@ -125,23 +126,13 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
          if (inputValue.imageUrl && response.data?._id) {
             console.log("Uploading product image from:", inputValue.imageUrl);
 
-            toast.info("Uploading product image...", {
-               position: "top-center",
-               autoClose: 2000,
-               hideProgressBar: true,
-               theme: "colored",
-            });
+            showToast.info("Uploading product image...");
 
             const base64Image = await downloadImageAsBase64(inputValue.imageUrl);
 
             if (base64Image) {
                await uploadImage(response.data._id, "", base64Image);
-               toast.success("Image uploaded!", {
-                  position: "top-center",
-                  autoClose: 1500,
-                  hideProgressBar: true,
-                  theme: "colored",
-               });
+               showToast.success("Image uploaded!");
             }
          }
 
@@ -169,44 +160,20 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
    }
 
    function handleValidationError(message: string) {
-      toast.error(message, {
-         position: "top-center",
-         autoClose: 5000,
-         hideProgressBar: true,
-         closeOnClick: true,
-         pauseOnHover: true,
-         draggable: true,
-         progress: undefined,
-         theme: "colored",
-      });
+      showToast.error(message);
    }
 
    async function handleBarcodeScanned(barcode: string) {
-      toast.info("Looking up product...", {
-         position: "top-center",
-         autoClose: 1500,
-         hideProgressBar: true,
-         theme: "colored",
-      });
+      showToast.info("Looking up product...");
 
       const productData = await lookupBarcode(barcode);
 
       if (productData && setInputValue) {
          setInputValue(productData);
 
-         toast.success(`Found: ${productData.name}`, {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: true,
-            theme: "colored",
-         });
+         showToast.success(`Found: ${productData.name}`);
       } else {
-         toast.error("Product not found in Open Food Facts database", {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: true,
-            theme: "colored",
-         });
+         showToast.error("Product not found in Open Food Facts database");
       }
    }
 
