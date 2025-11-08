@@ -23,38 +23,38 @@
       background-position-y: -100px;
       color: var.$font-light;
       z-index: 10;
-      @media screen and (max-width:1500px) {
+      @media screen and (max-width: 1500px) {
          position: initial;
          background-color: var.$secondary-bg;
          height: 20rem;
          min-height: 410px;
       }
-      @media screen and (max-width:870px) {
+      @media screen and (max-width: 870px) {
          position: initial;
       }
-      @media screen and (max-width:500px) {
+      @media screen and (max-width: 500px) {
          min-height: 470px;
       }
       .navWrapper {
          width: 100%;
          padding-left: 15%;
-         @media screen and (max-width:1500px) {
+         @media screen and (max-width: 1500px) {
             padding-left: 0;
          }
       }
       .banana {
          position: absolute;
-         top:15%;
+         top: 15%;
          right: 10%;
-         @media screen and (max-width:1500px) {
+         @media screen and (max-width: 1500px) {
             top: 18%;
             width: 200px;
          }
-         @media screen and (max-width:1070px) {
+         @media screen and (max-width: 1070px) {
             width: 120px;
             top: 23%;
          }
-         @media screen and (max-width:870px) {
+         @media screen and (max-width: 870px) {
             display: none;
          }
       }
@@ -69,7 +69,7 @@
             align-items: center;
             height: 2em;
             width: 2em;
-            background: rgb(253,137,32);
+            background: rgb(253, 137, 32);
             border: 2px solid white;
             font-size: 1.5rem;
          }
@@ -79,11 +79,16 @@
       }
    }
    .outerPanelWrapper {
+      position: relative;
       margin-top: min(35vmax, 600px);
-      @media screen and (max-width:1500px) {
+      z-index: 100;
+      &.scrolled {
+         z-index: auto;
+      }
+      @media screen and (max-width: 1500px) {
          margin-top: 1em;
       }
-      @media screen and (max-width:870px) {
+      @media screen and (max-width: 870px) {
          margin-top: 1em;
       }
       .productPanelWrapper {
@@ -95,10 +100,10 @@
          background-color: var.$secondary-bg;
          color: white;
          border-radius: 10px;
-         @media screen and (max-width:1200px) {
+         @media screen and (max-width: 1200px) {
             font-size: 0.8rem;
          }
-         @media screen and (max-width:800px) {
+         @media screen and (max-width: 800px) {
             flex-direction: column;
          }
          .imageWrapper {
@@ -122,14 +127,14 @@
                   border-radius: 5px;
                }
                input {
-                  opacity: 0; 
-                  position: absolute; 
-                  top: 0; 
-                  left: 0; 
-                  bottom: 0; 
-                  right: 0; 
-                  width: 100%; 
-                  height:100%;
+                  opacity: 0;
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  bottom: 0;
+                  right: 0;
+                  width: 100%;
+                  height: 100%;
                   cursor: pointer;
                }
             }
@@ -154,7 +159,7 @@
          }
          .nutrientWrapper {
             display: flex;
-            @media screen and (max-width:590px) {
+            @media screen and (max-width: 590px) {
                flex-direction: column;
                gap: 10px;
             }
@@ -203,6 +208,15 @@
          }
          .close:hover {
             outline: 2px solid white;
+         }
+      }
+      .noResults {
+         text-align: center;
+         button {
+            margin-top: 1rem;
+            padding: 0.3em 1em;
+            background-color: #fd8920;
+            color: white;
          }
       }
    }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import styles from "./Products.module.scss";
 import Navigation from "../components/Organisms/Navigation";
 import NewFoodPanel from "../components/Organisms/NewFoodPanel";
@@ -16,6 +16,8 @@ import {
 import { OptionContext, Options, InputValues } from "../context/OptionContext";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
+import ProductSearchFilter from "../components/Molecules/ProductSearchFilter";
+import { FilterOptions } from "../components/Molecules/ProductSearchFilter";
 
 type SelectedFood = {
    [key: string]: string | number;
@@ -25,7 +27,10 @@ export default function Products() {
    const { setOptionsData, food, setFoodData, setConsumptionData, setInputValue } =
       useContext(OptionContext) || {};
    const [selectedFood, setSelectedFood] = useState<SelectedFood>({});
-   const [loading, setLoading] = useState< string | false>(false);
+   const [loading, setLoading] = useState<string | false>(false);
+   const [searchQuery, setSearchQuery] = useState("");
+   const [filters, setFilters] = useState<FilterOptions>({});
+   const [isScrolled, setIsScrolled] = useState(false);
 
    useEffect(() => {
       const fetchOptions = async () => {
@@ -51,13 +56,50 @@ export default function Products() {
          }
       };
 
+      const handleScroll = () => {
+         // Remove z-index after scrolling even 1px
+         if (window.scrollY > 0) {
+            setIsScrolled(true);
+         } else {
+            setIsScrolled(false);
+         }
+      };
+
+      window.addEventListener("scroll", handleScroll);
+
       fetchOptions();
       getFood();
+
+      return () => {
+         window.removeEventListener("scroll", handleScroll);
+      };
    }, []);
 
    useEffect(() => {
       console.log({ selectedFood });
    }, [selectedFood]);
+
+   // Filtered food list
+   const filteredFood = useMemo(() => {
+      if (!food) return [];
+
+      return food.filter((item) => {
+         // Search filter
+         const matchesSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase());
+
+         if (!matchesSearch) return false;
+
+         // Macro filters
+         const { maxCalories, minProtein, maxCarbs, maxFat } = filters;
+
+         if (maxCalories && item.calories > maxCalories) return false;
+         if (minProtein && item.protein < minProtein) return false;
+         if (maxCarbs && item.carbohydrates > maxCarbs) return false;
+         if (maxFat && item.fat > maxFat) return false;
+
+         return true;
+      });
+   }, [food, searchQuery, filters]);
 
    function handleOnChange(name: string | undefined, value: string) {
       if (value === "" && name != undefined) {
@@ -196,29 +238,42 @@ export default function Products() {
             </div>
             <NewFoodPanel handleCreateMenu={handleCreateMenu} />
             <img className={styles.banana} src={banana} alt="A half peeled banana" />
-            <div title="Save products with gram values into balance" className={styles.addButtonWrapper}>
+            <div
+               title="Save products with gram values into balance"
+               className={styles.addButtonWrapper}
+            >
                {food && food?.length > 0 && <button onClick={handleSaveSelection}>+</button>}
             </div>
          </div>
-         <div className={styles.outerPanelWrapper}>
-            {food &&
-               food.map((food, index) => (
+         <div className={`${styles.outerPanelWrapper} ${isScrolled ? styles.scrolled : ""}`}>
+            {food && food.length > 0 && (
+               <ProductSearchFilter
+                  onSearch={setSearchQuery}
+                  onFilter={setFilters}
+                  totalProducts={food.length}
+                  filteredCount={filteredFood.length}
+               />
+            )}
+
+            {filteredFood.length > 0 ? (
+               filteredFood.map((foodItem, index) => (
                   <div key={index} className={styles.productPanelWrapper}>
+                     {/* ... your existing product card JSX ... */}
                      <div className={styles.titleWrapper}>
                         <div className={styles.imageWrapper}>
                            <p className={styles.image}>
-                              {loading === food._id ? (
+                              {loading === foodItem._id ? (
                                  <ClipLoader
-                                    loading={loading == food._id}
+                                    loading={loading == foodItem._id}
                                     size={20}
                                     aria-label="Loading Spinner"
                                     data-testid="loader"
                                  />
                               ) : (
-                                 food.image && (
+                                 foodItem.image && (
                                     <img
                                        className={styles.image_small}
-                                       src={import.meta.env.VITE_CLOUDINARY_URL + food.image}
+                                       src={import.meta.env.VITE_CLOUDINARY_URL + foodItem.image}
                                        alt=""
                                     />
                                  )
@@ -226,16 +281,16 @@ export default function Products() {
                               <input
                                  type="file"
                                  onChange={(evt) =>
-                                    handleUploadImage(food._id || "", food.image || "", evt)
+                                    handleUploadImage(foodItem._id || "", foodItem.image || "", evt)
                                  }
                               />
                            </p>
                            <p className={styles.title}>
-                              {food.name}
-                              {food.image && (
+                              {foodItem.name}
+                              {foodItem.image && (
                                  <img
                                     className={styles.image_large}
-                                    src={import.meta.env.VITE_CLOUDINARY_URL + food.image}
+                                    src={import.meta.env.VITE_CLOUDINARY_URL + foodItem.image}
                                     alt=""
                                  />
                               )}
@@ -244,30 +299,43 @@ export default function Products() {
                      </div>
                      <div className={styles.nutrientWrapper}>
                         <div className={styles.topNutrientWrapper}>
-                           <Macronutrient label="Kcal" value={food.calories} />
-                           <Macronutrient label="Carbs" value={food.carbohydrates} />
-                           <Macronutrient label="Fat" value={food.fat} />
-                           <Macronutrient label="Protein" value={food.protein} />
+                           <Macronutrient label="Kcal" value={foodItem.calories} />
+                           <Macronutrient label="Carbs" value={foodItem.carbohydrates} />
+                           <Macronutrient label="Fat" value={foodItem.fat} />
+                           <Macronutrient label="Protein" value={foodItem.protein} />
                         </div>
                         <div className={styles.bottomNutrientWrapper}>
-                           <Macronutrient label="Sat.Fat" value={food.saturatedFat} />
-                           <Macronutrient label="Sugar" value={food.sugar} />
-                           <Macronutrient label="Salt" value={food.salt} />
+                           <Macronutrient label="Sat.Fat" value={foodItem.saturatedFat} />
+                           <Macronutrient label="Sugar" value={foodItem.sugar} />
+                           <Macronutrient label="Salt" value={foodItem.salt} />
                            <div className={styles.gramsWrapper}>
                               <p>g</p>
                               <input
                                  type="text"
-                                 value={selectedFood[food.name || "empty"]}
-                                 onChange={(evt) => handleOnChange(food.name, evt.target.value)}
+                                 value={selectedFood[foodItem.name || "empty"]}
+                                 onChange={(evt) => handleOnChange(foodItem.name, evt.target.value)}
                               />
                            </div>
                         </div>
                      </div>
-                     <span className={styles.close} onClick={() => handleDeleteItem(food.name)}>
+                     <span className={styles.close} onClick={() => handleDeleteItem(foodItem.name)}>
                         x
                      </span>
                   </div>
-               ))}
+               ))
+            ) : (
+               <div className={styles.noResults}>
+                  <p>No products found matching your criteria</p>
+                  <button
+                     onClick={() => {
+                        setSearchQuery("");
+                        setFilters({});
+                     }}
+                  >
+                     Clear filters
+                  </button>
+               </div>
+            )}
          </div>
       </div>
    );
