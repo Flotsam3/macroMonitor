@@ -63,36 +63,40 @@ export default function BarcodeScanner({ onScan, isScanning, setIsScanning }: Ba
          const scanner = new Html5QrcodeScanner(
             "barcode-reader",
             {
-               fps: 10,
-               qrbox: { width: 300, height: 150 },
+               fps: 20,
+               qrbox: function (viewfinderWidth, viewfinderHeight) {
+                  // Responsive box that adapts to screen
+                  const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                  return {
+                     width: minEdge * 0.8,
+                     height: minEdge * 0.4, // Wide for barcodes
+                  };
+               },
                aspectRatio: 2.0,
+               // Only the most common formats (order matters - most common first!)
                formatsToSupport: [
-                  Html5QrcodeSupportedFormats.EAN_13,
+                  Html5QrcodeSupportedFormats.EAN_13, // Most common in Europe
+                  Html5QrcodeSupportedFormats.UPC_A, // Most common in USA
                   Html5QrcodeSupportedFormats.EAN_8,
-                  Html5QrcodeSupportedFormats.UPC_A,
-                  Html5QrcodeSupportedFormats.UPC_E,
                   Html5QrcodeSupportedFormats.CODE_128,
-                  Html5QrcodeSupportedFormats.CODE_39,
                   Html5QrcodeSupportedFormats.QR_CODE,
                ],
                rememberLastUsedCamera: true,
                showTorchButtonIfSupported: true,
-               disableFlip: false,
-               supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] // Only camera, no file upload
+               supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+               disableFlip: true, // Disable flip for faster processing
             },
-            false // Disable verbose logging
+            false // Verbose logging OFF for speed
          );
 
          scanner.render(
-            (decodedText, decodedResult) => {
-               console.log("Scanned:", decodedText, decodedResult.result.format?.formatName);
-
+            (decodedText) => {
                onScan(decodedText);
                scanner.clear();
                setIsScanning(false);
             },
             () => {
-               // Silent - errors are normal during scanning
+               // Silent - no logging for speed
             }
          );
 

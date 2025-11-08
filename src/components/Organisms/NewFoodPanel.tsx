@@ -118,44 +118,69 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
          const sanitized = sanitizeInput(inputValue as InputValue);
          if (!sanitized) return handleValidationError("Invalid data format!");
 
-         // Save the food item first
-         const response = await createFood(sanitized);
-         if (response.errors) return handleValidationError(response.errors[0].msg);
+         console.log("Creating food with data:", sanitized);
 
-         // If there's an image URL from barcode scan, upload it
-         if (inputValue.imageUrl && response.data?._id) {
-            console.log("Uploading product image from:", inputValue.imageUrl);
+         try {
+            // Save the food item first
+            const response = await createFood(sanitized);
 
-            showToast.info("Uploading product image...");
-
-            const base64Image = await downloadImageAsBase64(inputValue.imageUrl);
-
-            if (base64Image) {
-               await uploadImage(response.data._id, "", base64Image);
-               showToast.success("Image uploaded!");
+            if (!response) {
+               return handleValidationError("Failed to save food. Check console for details.");
             }
+
+            if (response.errors) {
+               return handleValidationError(response.errors[0].msg);
+            }
+
+            const foodId = response.data?._id || response._id || response.id;
+
+            if (!foodId) {
+               showToast.error("Food saved but no ID returned");
+            }
+
+            console.log("🖼️ Image URL from scan:", inputValue.imageUrl);
+
+            // If there's an image URL from barcode scan, upload it
+            if (inputValue.imageUrl && foodId) {
+               showToast.info("Uploading product image...");
+
+               try {
+                  const base64Image = await downloadImageAsBase64(inputValue.imageUrl);
+
+                  if (base64Image) {
+                     await uploadImage(foodId, "", base64Image);
+
+                     showToast.success("Image uploaded!");
+                  } else {
+                     showToast.error("Failed to download product image");
+                  }
+               } catch (error) {
+                  showToast.error("Image upload failed");
+               }
+            }
+
+            setInputValue({
+               name: "",
+               calories: "",
+               carbohydrates: "",
+               fat: "",
+               protein: "",
+               saturatedFat: "",
+               sugar: "",
+               salt: "",
+               imageUrl: "",
+            });
+
+            // Refresh food list
+            const data = await getAllFood();
+            if (setFoodData) {
+               setFoodData(data);
+            }
+
+            showToast.success("Food item created successfully!");
+         } catch (error) {
+            handleValidationError("An error occurred while saving");
          }
-
-         // Reset form
-         setInputValue({
-            name: "",
-            calories: "",
-            carbohydrates: "",
-            fat: "",
-            protein: "",
-            saturatedFat: "",
-            sugar: "",
-            salt: "",
-            imageUrl: "",
-         });
-
-         // Refresh food list
-         const data = await getAllFood();
-         if (setFoodData) {
-            setFoodData(data);
-         }
-
-         console.log("Food item created:", response);
       }
    }
 
