@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import ProductSearchFilter from "../components/Molecules/ProductSearchFilter";
 import { FilterOptions } from "../components/Molecules/ProductSearchFilter";
+import Pagination from "../components/Molecules/Pagination";
 
 type SelectedFood = {
    [key: string]: string | number;
@@ -31,6 +32,8 @@ export default function Products() {
    const [searchQuery, setSearchQuery] = useState("");
    const [filters, setFilters] = useState<FilterOptions>({});
    const [isScrolled, setIsScrolled] = useState(false);
+   const [currentPage, setCurrentPage] = useState(1);
+   const [itemsPerPage, setItemsPerPage] = useState(20);
 
    useEffect(() => {
       const fetchOptions = async () => {
@@ -100,6 +103,33 @@ export default function Products() {
          return true;
       });
    }, [food, searchQuery, filters]);
+
+   // Reset to page 1 when search/filter changes
+   useEffect(() => {
+      setCurrentPage(1);
+   }, [searchQuery, filters]);
+
+   // Paginated food
+   const paginatedFood = useMemo(() => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      return filteredFood.slice(startIndex, endIndex);
+   }, [filteredFood, currentPage, itemsPerPage]);
+
+   // Total pages
+   const totalPages = Math.ceil(filteredFood.length / itemsPerPage);
+
+   // Handle items per page change
+   const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // Reset to first page
+   };
+
+   // Scroll to top when page changes
+   const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+   };
 
    function handleOnChange(name: string | undefined, value: string) {
       if (value === "" && name != undefined) {
@@ -255,10 +285,9 @@ export default function Products() {
                />
             )}
 
-            {filteredFood.length > 0 ? (
-               filteredFood.map((foodItem, index) => (
+            {paginatedFood.length > 0 ? (
+               paginatedFood.map((foodItem, index) => (
                   <div key={index} className={styles.productPanelWrapper}>
-                     {/* ... your existing product card JSX ... */}
                      <div className={styles.titleWrapper}>
                         <div className={styles.imageWrapper}>
                            <p className={styles.image}>
@@ -335,6 +364,17 @@ export default function Products() {
                      Clear filters
                   </button>
                </div>
+            )}
+
+            {filteredFood.length > 0 && (
+               <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  itemsPerPage={itemsPerPage}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  totalItems={filteredFood.length}
+               />
             )}
          </div>
       </div>

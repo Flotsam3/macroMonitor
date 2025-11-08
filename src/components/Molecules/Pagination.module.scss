@@ -1,0 +1,156 @@
+.paginationWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+//   background: white;
+//   border: 2px solid #e5e7eb;
+//   border-radius: 12px;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+}
+
+.itemsInfo {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 500;
+
+  @media (max-width: 768px) {
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    order: 1;
+  }
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 480px) {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.pageNumbers {
+  display: flex;
+  gap: 0.25rem;
+
+  @media (max-width: 480px) {
+    gap: 0.125rem;
+  }
+}
+
+.pageButton {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.5rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled):not(.active) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+
+  &.active {
+    background: #FD8920;
+    border-color: #FD8920;
+    color: white;
+    font-weight: 600;
+  }
+
+  &.dots {
+    cursor: default;
+    border: none;
+    background: transparent;
+    
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  @media (max-width: 480px) {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+}
+
+.perPageSelector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: white;
+
+  @media (max-width: 768px) {
+    order: 2;
+  }
+
+  label {
+    font-weight: 500;
+  }
+
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    color: #374151;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #9ca3af;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+}

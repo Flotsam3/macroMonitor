@@ -51,7 +51,7 @@ export default function ProductSearchFilter({
   const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
 
   return (
-    <div className={styles.searchFilterWrapper}>
+    <div title="Configure filter options" className={styles.searchFilterWrapper}>
       {/* Search Bar */}
       <div className={styles.searchBar}>
         <Search className={styles.searchIcon} size={20} />
