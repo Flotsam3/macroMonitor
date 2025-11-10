@@ -17,7 +17,7 @@ import { OptionContext, Options, InputValues } from "../context/OptionContext";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import ProductSearchFilter from "../components/Molecules/ProductSearchFilter";
-import { FilterOptions } from "../components/Molecules/ProductSearchFilter";
+import { FilterOptions, SortOption } from "../components/Molecules/ProductSearchFilter";
 import Pagination from "../components/Molecules/Pagination";
 
 type SelectedFood = {
@@ -31,6 +31,7 @@ export default function Products() {
    const [loading, setLoading] = useState<string | false>(false);
    const [searchQuery, setSearchQuery] = useState("");
    const [filters, setFilters] = useState<FilterOptions>({});
+   const [sortBy, setSortBy] = useState<SortOption>("none");
    const [isScrolled, setIsScrolled] = useState(false);
    const [currentPage, setCurrentPage] = useState(1);
    const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -84,25 +85,58 @@ export default function Products() {
 
    // Filtered food list
    const filteredFood = useMemo(() => {
-      if (!food) return [];
+    if (!food) return [];
 
-      return food.filter((item) => {
-         // Search filter
-         const matchesSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase());
+    // Filter
+    let result = food.filter((item) => {
+      const matchesSearch = item.name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase());
 
-         if (!matchesSearch) return false;
+      if (!matchesSearch) return false;
 
-         // Macro filters
-         const { maxCalories, minProtein, maxCarbs, maxFat } = filters;
+      const { maxCalories, minProtein, maxCarbs, maxFat } = filters;
 
-         if (maxCalories && item.calories > maxCalories) return false;
-         if (minProtein && item.protein < minProtein) return false;
-         if (maxCarbs && item.carbohydrates > maxCarbs) return false;
-         if (maxFat && item.fat > maxFat) return false;
+      if (maxCalories && item.calories > maxCalories) return false;
+      if (minProtein && item.protein < minProtein) return false;
+      if (maxCarbs && item.carbohydrates > maxCarbs) return false;
+      if (maxFat && item.fat > maxFat) return false;
 
-         return true;
+      return true;
+    });
+
+    // Sort
+    if (sortBy !== "none") {
+      result = [...result].sort((a, b) => {
+        switch (sortBy) {
+          case "calories-asc":
+            return (a.calories || 0) - (b.calories || 0);
+          case "calories-desc":
+            return (b.calories || 0) - (a.calories || 0);
+          case "protein-asc":
+            return (a.protein || 0) - (b.protein || 0);
+          case "protein-desc":
+            return (b.protein || 0) - (a.protein || 0);
+          case "carbs-asc":
+            return (a.carbohydrates || 0) - (b.carbohydrates || 0);
+          case "carbs-desc":
+            return (b.carbohydrates || 0) - (a.carbohydrates || 0);
+          case "fat-asc":
+            return (a.fat || 0) - (b.fat || 0);
+          case "fat-desc":
+            return (b.fat || 0) - (a.fat || 0);
+          case "name-asc":
+            return (a.name || "").localeCompare(b.name || "");
+          case "name-desc":
+            return (b.name || "").localeCompare(a.name || "");
+          default:
+            return 0;
+        }
       });
-   }, [food, searchQuery, filters]);
+    }
+
+    return result;
+  }, [food, searchQuery, filters, sortBy]);
 
    // Reset to page 1 when search/filter changes
    useEffect(() => {
@@ -280,6 +314,7 @@ export default function Products() {
                <ProductSearchFilter
                   onSearch={setSearchQuery}
                   onFilter={setFilters}
+                  onSort={setSortBy}
                   totalProducts={food.length}
                   filteredCount={filteredFood.length}
                />
