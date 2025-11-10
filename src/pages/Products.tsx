@@ -33,6 +33,7 @@ export default function Products() {
    const [filters, setFilters] = useState<FilterOptions>({});
    const [sortBy, setSortBy] = useState<SortOption>("none");
    const [isScrolled, setIsScrolled] = useState(false);
+   const [isModalOpen, setIsModalOpen] = useState(false);
    const [currentPage, setCurrentPage] = useState(1);
    const [itemsPerPage, setItemsPerPage] = useState(20);
 
@@ -85,58 +86,56 @@ export default function Products() {
 
    // Filtered food list
    const filteredFood = useMemo(() => {
-    if (!food) return [];
+      if (!food) return [];
 
-    // Filter
-    let result = food.filter((item) => {
-      const matchesSearch = item.name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
+      // Filter
+      let result = food.filter((item) => {
+         const matchesSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      if (!matchesSearch) return false;
+         if (!matchesSearch) return false;
 
-      const { maxCalories, minProtein, maxCarbs, maxFat } = filters;
+         const { maxCalories, minProtein, maxCarbs, maxFat } = filters;
 
-      if (maxCalories && item.calories > maxCalories) return false;
-      if (minProtein && item.protein < minProtein) return false;
-      if (maxCarbs && item.carbohydrates > maxCarbs) return false;
-      if (maxFat && item.fat > maxFat) return false;
+         if (maxCalories && item.calories > maxCalories) return false;
+         if (minProtein && item.protein < minProtein) return false;
+         if (maxCarbs && item.carbohydrates > maxCarbs) return false;
+         if (maxFat && item.fat > maxFat) return false;
 
-      return true;
-    });
-
-    // Sort
-    if (sortBy !== "none") {
-      result = [...result].sort((a, b) => {
-        switch (sortBy) {
-          case "calories-asc":
-            return (a.calories || 0) - (b.calories || 0);
-          case "calories-desc":
-            return (b.calories || 0) - (a.calories || 0);
-          case "protein-asc":
-            return (a.protein || 0) - (b.protein || 0);
-          case "protein-desc":
-            return (b.protein || 0) - (a.protein || 0);
-          case "carbs-asc":
-            return (a.carbohydrates || 0) - (b.carbohydrates || 0);
-          case "carbs-desc":
-            return (b.carbohydrates || 0) - (a.carbohydrates || 0);
-          case "fat-asc":
-            return (a.fat || 0) - (b.fat || 0);
-          case "fat-desc":
-            return (b.fat || 0) - (a.fat || 0);
-          case "name-asc":
-            return (a.name || "").localeCompare(b.name || "");
-          case "name-desc":
-            return (b.name || "").localeCompare(a.name || "");
-          default:
-            return 0;
-        }
+         return true;
       });
-    }
 
-    return result;
-  }, [food, searchQuery, filters, sortBy]);
+      // Sort
+      if (sortBy !== "none") {
+         result = [...result].sort((a, b) => {
+            switch (sortBy) {
+               case "calories-asc":
+                  return (a.calories || 0) - (b.calories || 0);
+               case "calories-desc":
+                  return (b.calories || 0) - (a.calories || 0);
+               case "protein-asc":
+                  return (a.protein || 0) - (b.protein || 0);
+               case "protein-desc":
+                  return (b.protein || 0) - (a.protein || 0);
+               case "carbs-asc":
+                  return (a.carbohydrates || 0) - (b.carbohydrates || 0);
+               case "carbs-desc":
+                  return (b.carbohydrates || 0) - (a.carbohydrates || 0);
+               case "fat-asc":
+                  return (a.fat || 0) - (b.fat || 0);
+               case "fat-desc":
+                  return (b.fat || 0) - (a.fat || 0);
+               case "name-asc":
+                  return (a.name || "").localeCompare(b.name || "");
+               case "name-desc":
+                  return (b.name || "").localeCompare(a.name || "");
+               default:
+                  return 0;
+            }
+         });
+      }
+
+      return result;
+   }, [food, searchQuery, filters, sortBy]);
 
    // Reset to page 1 when search/filter changes
    useEffect(() => {
@@ -300,7 +299,7 @@ export default function Products() {
             <div className={styles.navWrapper}>
                <Navigation />
             </div>
-            <NewFoodPanel handleCreateMenu={handleCreateMenu} />
+            <NewFoodPanel handleCreateMenu={handleCreateMenu} onModalStateChange={setIsModalOpen} />
             <img className={styles.banana} src={banana} alt="A half peeled banana" />
             <div
                title="Save products with gram values into balance"
@@ -309,7 +308,7 @@ export default function Products() {
                {food && food?.length > 0 && <button onClick={handleSaveSelection}>+</button>}
             </div>
          </div>
-         <div className={`${styles.outerPanelWrapper} ${isScrolled ? styles.scrolled : ""}`}>
+         <div className={`${styles.outerPanelWrapper} ${isScrolled || isModalOpen ? styles.scrolled : ""}`}>
             {food && food.length > 0 && (
                <ProductSearchFilter
                   onSearch={setSearchQuery}

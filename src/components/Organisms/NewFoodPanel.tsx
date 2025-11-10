@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import styles from "./NewFoodPanel.module.scss";
 import MacronutrientInput from "../Molecules/MacronutrientInput";
 import Button from "../Atoms/Button";
@@ -8,8 +8,10 @@ import { OptionContext } from "../../context/OptionContext";
 import { ToastContainer, Zoom } from "react-toastify";
 import { useState } from "react";
 import BarcodeScanner from "../Molecules/BarcodeScanner";
+import ProductNameSearch from "../Molecules/ProductNameSearch";
 import { lookupBarcode } from "../../services/productLookup";
 import { downloadImageAsBase64 } from "../../services/imageHelper";
+import { ProductSearchResult } from "../../services/searchProductByName";
 import "react-toastify/dist/ReactToastify.css";
 import { showToast } from "../Atoms/CustomToast";
 
@@ -17,11 +19,17 @@ type HandleCreateMenuType = () => void;
 
 type NewFoodPanelProps = {
    handleCreateMenu: HandleCreateMenuType;
+   onModalStateChange?: (isOpen: boolean) => void;
 };
 
-export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): JSX.Element {
+export default function NewFoodPanel({ handleCreateMenu, onModalStateChange  }: NewFoodPanelProps): JSX.Element {
    const { setFoodData, inputValue, setInputValue } = useContext(OptionContext);
    const [isScanning, setIsScanning] = useState(false);
+   const [isSearching, setIsSearching] = useState(false);
+
+   useEffect(() => {
+    onModalStateChange?.(isScanning || isSearching);
+  }, [isScanning, isSearching, onModalStateChange]);
 
    function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
       const name = evt.target.name;
@@ -138,7 +146,7 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
                showToast.error("Food saved but no ID returned");
             }
 
-            console.log("🖼️ Image URL from scan:", inputValue.imageUrl);
+            console.log("Image URL from scan:", inputValue.imageUrl);
 
             // If there's an image URL from barcode scan, upload it
             if (inputValue.imageUrl && foodId) {
@@ -202,6 +210,12 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
       }
    }
 
+   function handleProductSelected(product: ProductSearchResult) {
+      if (setInputValue) {
+         setInputValue(product);
+      }
+   }
+
    return (
       <div className={styles.panelWrapper}>
          <ToastContainer
@@ -222,12 +236,26 @@ export default function NewFoodPanel({ handleCreateMenu }: NewFoodPanelProps): J
          <div className={styles.panel}>
             <div className={styles.nameWrapper}>
                <h4>{"Name"}</h4>
-               <input type="text" name="name" value={inputValue?.name} onChange={handleChange} />
-               <BarcodeScanner
-                  onScan={handleBarcodeScanned}
-                  isScanning={isScanning}
-                  setIsScanning={setIsScanning}
-               />
+               <div className={styles.nameInputGroup}>
+                  <input
+                     type="text"
+                     name="name"
+                     value={inputValue?.name || ""}
+                     onChange={handleChange}
+                  />
+                  <div className={styles.iconButtons}>
+                     <ProductNameSearch
+                        searchQuery={inputValue?.name || ""}
+                        onSelect={handleProductSelected}
+                        onModalStateChange={setIsSearching} 
+                     />
+                     <BarcodeScanner
+                        onScan={handleBarcodeScanned}
+                        isScanning={isScanning}
+                        setIsScanning={setIsScanning}
+                     />
+                  </div>
+               </div>
             </div>
             <div className={styles.macrosWrapper}>
                <MacronutrientInput

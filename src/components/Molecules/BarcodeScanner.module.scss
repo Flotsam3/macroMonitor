@@ -1,23 +1,14 @@
 .scanIconButton {
-  position: absolute;
-  top: unset;
-  bottom: -50px;
-  left: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
   background: linear-gradient(135deg, #639E61 0%, #1e5e1a 100%);
+  font-size: 0.8rem;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
-  @media (max-width: 870px) {
-    top: -45px;
-  }
 
   &:hover {
     transform: translateY(-2px) scale(1.05);

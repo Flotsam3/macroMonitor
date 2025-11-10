@@ -51,11 +51,24 @@
          width: 12em;
          .nameInputGroup {
             display: flex;
+            flex-direction: column;
             gap: 0.5rem;
-            align-items: center;
 
             input {
                flex: 1; // Makes input take remaining space
+            }
+
+            .iconButtons {
+               position: absolute;
+               top: 70px;
+               display: flex;
+               gap: 0.5rem;
+               align-self: center;
+
+               @media screen and (max-width: 870px) {
+                  top: 23px;
+                  right: -120px;
+               }
             }
          }
          h4 {
@@ -69,6 +82,9 @@
             text-align: center;
             border-radius: 99vh;
             border: none;
+            @media screen and (max-width: 870px) {
+               width: 100%;
+            }
          }
       }
       .macrosWrapper {
