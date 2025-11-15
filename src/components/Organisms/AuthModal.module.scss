@@ -23,12 +23,17 @@
   animation: slideUp 0.3s ease;
 }
 
+.errorContainer {
+  min-height: 3.5rem; // Reserve space
+  margin-bottom: 0.5rem;
+}
+
 .error {
   background-color: #fee;
   color: #c33;
   padding: 12px;
   border-radius: 6px;
-  margin-bottom: 16px;
+  // margin-bottom: 16px;
   font-size: 14px;
   border: 1px solid #fcc;
 }

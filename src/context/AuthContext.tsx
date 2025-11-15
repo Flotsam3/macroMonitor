@@ -42,16 +42,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    }, []);
 
    const login = async (email: string, password: string) => {
-      const data = await apiLogin(email, password);
-      if (data?.user) {
-         setUser(data.user);
+      try {
+         const data = await apiLogin(email, password);
+
+         if (data?.user) {
+            setUser(data.user);
+         } else {
+            throw new Error("Invalid login response - no user data");
+         }
+      } catch (error) {
+         setUser(null);
+         throw error; // Re-throw so AuthModal catches it
       }
    };
 
    const register = async (email: string, password: string, name?: string) => {
-      const data = await apiRegister(email, password, name);
-      if (data?.user) {
-         setUser(data.user);
+      try {
+         const data = await apiRegister(email, password, name);
+
+         if (data?.user) {
+            setUser(data.user);
+         } else {
+            throw new Error("Invalid registration response - no user data");
+         }
+      } catch (error) {
+         setUser(null);
+         throw error;
       }
    };
 

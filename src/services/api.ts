@@ -6,49 +6,59 @@ const URL: string = import.meta.env.VITE_API_URL || "/api";
  * Check if user is authenticated (doesn't redirect on failure)
  */
 export const checkAuth = async () => {
-  try {
-    const response = await fetch(URL + "/profile", {
-      credentials: "include",
-    });
+   try {
+      const response = await fetch(URL + "/profile", {
+         credentials: "include",
+      });
 
-    if (response.ok) {
-      return await response.json();
-    }
-    return null;
-  } catch (error) {
-    console.error("Auth check error:", error);
-    return null;
-  }
+      if (response.ok) {
+         return await response.json();
+      }
+      return null;
+   } catch (error) {
+      console.error("Auth check error:", error);
+      return null;
+   }
 };
 
 /**
  * Handle fetch with error handling
  */
 const apiFetch = async (url: string, options?: RequestInit) => {
-  try {
-    const response = await fetch(url, {...options, credentials: "include"});
+   const response = await fetch(url, { ...options, credentials: "include" });
 
-    // Handle 401 - token expired/invalid
-    if (response.status === 401) {
-      window.location.href = "/"; // Redirect to landing page
-      throw new Error("Unauthorized");
-    }
+   // Handle 401 - but DON'T redirect for login/register endpoints
+   if (response.status === 401) {
+      const isAuthEndpoint = url.includes("/login") || url.includes("/register");
 
-    if (!response.ok) {
-      console.error(`Error: ${response.status} ${response.statusText}`);
-      return null;
-    }
+      if (!isAuthEndpoint) {
+         // Only redirect if it's a protected endpoint (not login/register)
+         window.location.href = "/";
+      }
 
-    // Handle 204 No Content
-    if (response.status === 204) {
+      // Extract error message from response
+      const errorData = await response.json().catch(() => ({ message: "Unauthorized" }));
+      const error: any = new Error(errorData.message || "Unauthorized");
+      error.response = { data: errorData, status: 401 };
+      throw error;
+   }
+
+   if (!response.ok) {
+      // Handle other error responses (400, 500, etc.)
+      const errorData = await response.json().catch(() => ({}));
+      const error: any = new Error(
+         errorData.message || errorData.error || `Error: ${response.status}`
+      );
+      error.response = { data: errorData, status: response.status };
+      throw error;
+   }
+
+   // Handle 204 No Content
+   if (response.status === 204) {
       return true;
-    }
+   }
 
-    return await response.json();
-  } catch (error) {
-    console.error("Network error:", error);
-    return null;
-  }
+   return await response.json();
 };
 
 // ============================================
@@ -56,30 +66,30 @@ const apiFetch = async (url: string, options?: RequestInit) => {
 // ============================================
 
 export const register = async (email: string, password: string, name?: string) => {
-  return apiFetch(URL + "/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, name }),
-  });
+   return apiFetch(URL + "/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name }),
+   });
 };
 
 export const login = async (email: string, password: string) => {
-  return apiFetch(URL + "/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+   return apiFetch(URL + "/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+   });
 };
 
 export const logout = async () => {
-  await apiFetch(URL + "/logout", {
-    method: "POST",
-  });
-  window.location.href = "/";
+   await apiFetch(URL + "/logout", {
+      method: "POST",
+   });
+   window.location.href = "/";
 };
 
 export const getProfile = async () => {
-  return apiFetch(URL + "/profile");
+   return apiFetch(URL + "/profile");
 };
 
 // ============================================
@@ -87,25 +97,25 @@ export const getProfile = async () => {
 // ============================================
 
 export const createOptions = async (payload: object) => {
-  return apiFetch(URL + "/options", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+   return apiFetch(URL + "/options", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+   });
 };
 
 export const updateOptions = async (payload: object) => {
-  return apiFetch(URL + "/options", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+   return apiFetch(URL + "/options", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+   });
 };
 
 export const getAllOptions = async () => {
-  return apiFetch(URL + "/options", {
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + "/options", {
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 // ============================================
@@ -113,37 +123,37 @@ export const getAllOptions = async () => {
 // ============================================
 
 export const createFood = async (payload: object) => {
-  return apiFetch(URL + "/food", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+   return apiFetch(URL + "/food", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+   });
 };
 
 export const getAllFood = async () => {
-  return apiFetch(URL + "/food", {
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + "/food", {
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 export const deleteFoodItem = async (payload: object) => {
-  return apiFetch(URL + "/food", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+   return apiFetch(URL + "/food", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+   });
 };
 
 export const uploadImage = async (
-  id: string,
-  image: string,
-  base64Image: string | ArrayBuffer
+   id: string,
+   image: string,
+   base64Image: string | ArrayBuffer
 ): Promise<void> => {
-  return apiFetch(URL + "/food/images/" + id, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ previousImage: image, image: base64Image }),
-  });
+   return apiFetch(URL + "/food/images/" + id, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ previousImage: image, image: base64Image }),
+   });
 };
 
 // ============================================
@@ -151,31 +161,31 @@ export const uploadImage = async (
 // ============================================
 
 export const saveConsumption = async (payload: Options[]) => {
-  return apiFetch(URL + "/consumption", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+   return apiFetch(URL + "/consumption", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+   });
 };
 
 export const getConsumption = async () => {
-  return apiFetch(URL + "/consumption", {
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + "/consumption", {
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 export const deleteConsumptionItem = async (id: string): Promise<void> => {
-  return apiFetch(URL + `/consumption/${id}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + `/consumption/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 export const deleteConsumption = async (): Promise<void> => {
-  return apiFetch(URL + "/consumption", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + "/consumption", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 // ============================================
@@ -183,29 +193,29 @@ export const deleteConsumption = async (): Promise<void> => {
 // ============================================
 
 export const createArchiveItem = async (payload: object) => {
-  return apiFetch(URL + "/archive", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+   return apiFetch(URL + "/archive", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+   });
 };
 
 export const getArchive = async () => {
-  return apiFetch(URL + "/archive", {
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + "/archive", {
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 export const deleteArchiveItem = async (id: string): Promise<void> => {
-  return apiFetch(URL + `/archive/${id}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + `/archive/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+   });
 };
 
 export const deleteArchive = async (): Promise<void> => {
-  return apiFetch(URL + "/archive", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-  });
+   return apiFetch(URL + "/archive", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+   });
 };
