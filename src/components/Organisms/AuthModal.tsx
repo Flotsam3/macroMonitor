@@ -25,11 +25,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
 
    if (!isOpen) return null;
 
-   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      // Click-outside disabled for auth modal - prevents accidental closes
-      return;
-   };
-
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setError(null);
