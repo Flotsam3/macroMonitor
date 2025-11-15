@@ -1,68 +1,86 @@
 export interface ProductSearchResult {
-  name: string;
-  calories: string;
-  carbohydrates: string;
-  fat: string;
-  protein: string;
-  saturatedFat: string;
-  sugar: string;
-  salt: string;
-  imageUrl?: string;
+   name: string;
+   calories: string;
+   carbohydrates: string;
+   fat: string;
+   protein: string;
+   saturatedFat: string;
+   sugar: string;
+   salt: string;
+   imageUrl?: string;
 }
 
-export async function searchProductByName(
-  query: string
-): Promise<ProductSearchResult[]> {
-  try {
-    console.log("Searching for:", query);
+export async function searchProductByName(query: string): Promise<ProductSearchResult[]> {
+   try {
+      console.log("Searching USDA for:", query);
 
-    // Open Food Facts text search API
-    const response = await fetch(
-      `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(
-        query
-      )}&search_simple=1&action=process&json=1&page_size=10`
-    );
+      const apiKey = import.meta.env.VITE_USDA_API_KEY;
 
-    const data = await response.json();
-    console.log("Search API response:", data);
+      if (!apiKey) {
+         console.error("USDA API key not found in environment variables");
+         return [];
+      }
 
-    if (data.products && data.products.length > 0) {
-      const results: ProductSearchResult[] = data.products.map((product: any) => {
-        const nutrients = product.nutriments || {};
+      const response = await fetch(
+         `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${apiKey}&query=${encodeURIComponent(
+            query
+         )}&pageSize=15&dataType=Foundation,SR Legacy`
+      );
 
-        const getNutrient = (key: string): string => {
-          const value = nutrients[key];
-          if (value === null || value === undefined || value === "") {
-            return "0";
-          }
-          return String(value);
-        };
+      if (!response.ok) {
+         console.error("USDA API error:", response.status, response.statusText);
+         return [];
+      }
 
-        return {
-          name:
-            product.product_name ||
-            product.product_name_en ||
-            product.product_name_de ||
-            "Unknown Product",
-          calories: getNutrient("energy-kcal_100g"),
-          carbohydrates: getNutrient("carbohydrates_100g"),
-          fat: getNutrient("fat_100g"),
-          protein: getNutrient("proteins_100g"),
-          saturatedFat: getNutrient("saturated-fat_100g"),
-          sugar: getNutrient("sugars_100g"),
-          salt: getNutrient("salt_100g"),
-          imageUrl: product.image_url || product.image_front_url || "",
-        };
-      });
+      const data = await response.json();
 
-      console.log("Formatted search results:", results);
-      return results;
-    }
+      if (data.foods && data.foods.length > 0) {
+         const results: ProductSearchResult[] = data.foods
+            .map((food: any) => {
+               // Helper to find nutrient by name AND unit
+               const getNutrient = (nutrientName: string, unitName?: string): string => {
+                  const nutrient = food.foodNutrients?.find((n: any) => {
+                     const nameMatch = n.nutrientName === nutrientName;
+                     const unitMatch = !unitName || n.unitName === unitName;
+                     return nameMatch && unitMatch;
+                  });
+                  return nutrient?.value ? String(nutrient.value) : "0";
+               };
 
-    console.log("No products found");
-    return [];
-  } catch (error) {
-    console.error("Error searching products:", error);
-    return [];
-  }
+               // Convert sodium to salt
+               const sodiumMg = parseFloat(getNutrient("Sodium, Na", "MG"));
+               const saltG = sodiumMg > 0 ? ((sodiumMg * 2.5) / 1000).toFixed(2) : "0";
+
+               return {
+                  name: food.description || "Unknown Food",
+                  calories: getNutrient("Energy", "KCAL"), // Specify KCAL not kJ
+                  carbohydrates: getNutrient("Carbohydrate, by difference", "G"),
+                  fat: getNutrient("Total lipid (fat)", "G"),
+                  protein: getNutrient("Protein", "G"),
+                  saturatedFat: getNutrient("Fatty acids, total saturated", "G"),
+                  sugar: getNutrient("Total Sugars", "G"),
+                  salt: saltG,
+                  imageUrl: "",
+               };
+            })
+            // Filter out incomplete entries (0 calories = bad data)
+            .filter((result: ProductSearchResult) => {
+               const hasCalories = parseFloat(result.calories) > 0;
+               const hasProteinOrCarbs =
+                  parseFloat(result.protein) > 0 || parseFloat(result.carbohydrates) > 0;
+               return hasCalories && hasProteinOrCarbs;
+            })
+            // Limit to top 10 quality results
+            .slice(0, 10);
+
+         console.log(`Returning ${results.length} quality results`);
+         return results;
+      }
+
+      console.log("No foods found in USDA");
+      return [];
+   } catch (error) {
+      console.error("Error searching USDA:", error);
+      return [];
+   }
 }
