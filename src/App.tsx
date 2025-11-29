@@ -8,14 +8,20 @@ import OptionsProvider from "./context/OptionContext";
 import LandingPage from "./pages/LandingPage";
 import ProtectedLayout from "./components/ProtectedLayout";
 import { AuthProvider } from "./context/AuthContext";
+import Imprint from "./pages/Imprint";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ScrollToTop from "./services/ScrollToTop";
 
 function App() {
    return (
       <BrowserRouter>
+         <ScrollToTop />
          <AuthProvider>
             <OptionsProvider>
                <Routes>
                   <Route path="/" element={<LandingPage />} />
+                  <Route path="/imprint" element={<Imprint />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
 
                   <Route element={<ProtectedLayout />}>
                      <Route path="/balance" element={<Balance />} />

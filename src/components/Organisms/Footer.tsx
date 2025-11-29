@@ -1,5 +1,6 @@
 import Logo from "../Atoms/Logo";
 import styles from "./Footer.module.scss";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   function getYear(){
@@ -26,7 +27,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className={styles.links}>
+          {/* <div className={styles.links}>
             <h4>Company</h4>
             <ul>
               <li>About Us</li>
@@ -34,14 +35,13 @@ export default function Footer() {
               <li>Careers</li>
               <li>Contact</li>
             </ul>
-          </div>
+          </div> */}
 
           <div className={styles.links}>
             <h4>Legal</h4>
             <ul>
-              <li>Privacy Policy</li>
-              <li>Terms of Service</li>
-              <li>Cookie Policy</li>
+              <li><Link to="/imprint">Imprint</Link></li>
+              <li><Link to="/privacy">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>
